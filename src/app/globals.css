@@ -28,6 +28,10 @@ body {
     width: 80%;
 }
 
+.codebox:focus {
+    outline: solid 2px rgb(105, 208, 255);
+}
+
 .roundbox {
     background-color: rgb(247, 249, 250);
     border-radius: 14px;
@@ -46,6 +50,11 @@ button {
 
 button:hover {
     background-color: rgb(0, 127, 212);
+    cursor: pointer;
+}
+
+button:active {
+    background-color: rgb(0, 79, 163);
     cursor: pointer;
 }
 
