@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from "react"
+import { redirect } from "next/navigation";
+import React, { useState } from "react";
 
 export default function Page1() {
     // TODO: connect to the server to verify that the game code exists before allowing the user to join
@@ -56,6 +57,7 @@ function JoinBox() {
         // Try to submit the join request with the code
         console.log("Submitting the join request with code `" + currentCode + "`...")
         // TODO: impl
+        redirect(`/page2?code=${currentCode}`)
     }
     return (
         <div className="roundbox">

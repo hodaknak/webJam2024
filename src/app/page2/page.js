@@ -21,10 +21,6 @@ export default function Page2() {
         })
     }, []);
 
-    /*useEffect(() => {
-        const url = `${pathname}?${searchParams}
-    }, [pathname, params])*/
-
     const sendMessage = () => {
         console.log(fieldText);
         socket.emit("msg", fieldText);
@@ -36,7 +32,6 @@ export default function Page2() {
         let res = params.get("code")
         if (res == null) {
             // Invalid
-        //return `${params}`
             // TODO: what to do if it does not exist
             return "INVALID CODE!"
         }
@@ -46,7 +41,7 @@ export default function Page2() {
 
     return (
         <div className="w-full text-center">
-            (Room code:{getRoomCode()})
+            (Room code: <span style={{"fontFamily": "monospace"}}>{getRoomCode()}</span>)
             <p className="text-xl mt-20">
                 Your question is:
                 <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
