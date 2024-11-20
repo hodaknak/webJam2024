@@ -35,5 +35,24 @@
 32. Who's someone you really admire?
 33. Would you rather be too hot or too cold?
 34. Are you a cat or dog person?
-35. What did you want to be when you grew up?
-36. What do you want to be?
+35. When you were a child, what did you want to be when you grew up?
+36. What are your goals after graduation?
+37. If you could live anywhere in the world for a year, where would it be?
+38. If you could live in one fictional universe, which one would you choose?
+39. If you could only keep 3 app on your phone, which would they be?
+40. What one meal would you eat for the rest of your life?
+41. What are you most excited for this year?
+42. What is your major?
+43. What school subject is your favorite?
+44. What school subject is your least favorite?
+45. What's your favorite season?
+46. What's your favorite place you've travelled to?
+47. What's on your bucket list?
+48. What is your favorite ice cream flavor?
+49. What is your most used phone app?
+
+## The following are original questions
+1. What has been your favorite college experience so far? 
+2. What is your favorite meal of the day?
+3. Milk or cereal first? Or other?
+4. 
