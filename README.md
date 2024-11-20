@@ -26,9 +26,11 @@ Pages auto-update as you edit the files.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Usage
+## Usage (for users)
 
-Host: just go to the homepage, click `Create Game`, and you're good to go!
+Host: just go to the homepage, click `Create a game`, and give all participants the room code. You will not be able to participate yourself, but you will be able to monitor who has joined.
+
+Participant: just go to the homepage, enter the room code in the box, and click `Join game`.
 
 ## Credits
 This was created for the ICSSC WebJam 2024 at UCI by Caden Lee, Hodaka Nakamura, Kelvin Wu, and Kyle Kim.
