@@ -14,8 +14,8 @@ export default function Navbar({toggle}) {
                         <Logo/>
                         <ul className="hidden md:flex gap-x-6 text-black">
                             <li>
-                                <Link href="/page1">
-                                    <p className="link link-underline">Page 1</p>
+                                <Link href="/">
+                                    <p className="link link-underline">Home</p>
                                 </Link>
                             </li>
                             <li>
