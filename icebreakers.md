@@ -50,9 +50,13 @@
 47. What's on your bucket list?
 48. What is your favorite ice cream flavor?
 49. What is your most used phone app?
+50. Cookies or brownies?
+51. How many languages can you speak?
+52. 
 
 ## The following are original questions
 1. What has been your favorite college experience so far? 
 2. What is your favorite meal of the day?
 3. Milk or cereal first? Or other?
-4. 
+4. When do you sleep?
+5. 
