@@ -15,7 +15,7 @@
 12. How is GIF pronounced?
 13. Is a hotdog a sandwich?
 14. What are your biggest phobias?
-15. What clubs were you a member of in high school?
+15. What clubs have you participated in?
 16. What is something you hate doing?
 17. What is something you love doing?
 18. What is something you think is overrated?
@@ -36,13 +36,13 @@
 33. Would you rather be too hot or too cold?
 34. Are you a cat or dog person?
 35. When you were a child, what did you want to be when you grew up?
-36. What are your goals after graduation?
+36. If you could go to any point in history, when and where would you go?
 37. If you could live anywhere in the world for a year, where would it be?
 38. If you could live in one fictional universe, which one would you choose?
 39. If you could only keep 3 app on your phone, which would they be?
 40. What one meal would you eat for the rest of your life?
 41. What are you most excited for this year?
-42. What is your major?
+42. What is your major and why?
 43. What school subject is your favorite?
 44. What school subject is your least favorite?
 45. What's your favorite season?
@@ -52,11 +52,25 @@
 49. What is your most used phone app?
 50. Cookies or brownies?
 51. How many languages can you speak?
-52. 
+52. What animal would you chose to be?
+53. Name one good and one bad thing about yourself.
+54. 
 
 ## The following are original questions
-1. What has been your favorite college experience so far? 
+1. What is your preferred water?
 2. What is your favorite meal of the day?
-3. Milk or cereal first? Or other?
+3. Milk first or cereal first? Or other?
 4. When do you sleep?
-5. 
+5. Favorite day of the week?
+6. Favorite time of day?
+7. How many friends do you have?
+8. How tired are you currently?
+9. How often do you read?
+10. How often do you watch tv?
+11. How often do you play games?
+12. What pets do you have?
+13. What is a trait you look up to?
+14. What are your favorite icebreaker questions?
+15. What are your least favorite icebreaker questions?
+16. What are some good icebreaker questions?
+17. 
