@@ -17,6 +17,7 @@ const geistMono = localFont({
 
 const libreFranklin = Libre_Franklin({
     weight: "100",
+    subsets: ["latin"]
 })
 
 export const metadata = {

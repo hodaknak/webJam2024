@@ -13,6 +13,11 @@ pnpm dev
 bun dev
 ```
 
+On a separate shell, run:
+```bash
+node server/server.js
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
@@ -40,3 +45,4 @@ This was created for the ICSSC WebJam 2024 at UCI by Caden Lee, Hodaka Nakamura,
 Technologies and tools:
     - [Next.js](https://nextjs.org) (bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app))
     - Tailwind CSS
+test
