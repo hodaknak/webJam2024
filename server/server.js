@@ -44,6 +44,7 @@ io.on("connection", (socket) => {
 
         // TODO: add message to database
         // TODO: fetch name from database
+        // TODO: get all socket ids in the room, use io.sockets.socket(socketid).emit() to send to all clients in room
 
         let res = {
             name: `whoever ${user} is`,
