@@ -27,10 +27,40 @@ io.on("connection", (socket) => {
     // allegedly socket.broadcast can be used to send to all other clients
     // socket.id also seems useful
 
+    /* this was tested endpoint
     socket.on("msg", (msg) => {
         console.log(socket.id + ': ' + msg);
         io.emit("msg", msg);
-    });
+    });*/
+
+    socket.on("fetchRoom", (msg) => {
+        // object should have name and code field
+
+        let roomName = msg.name;
+        let roomCode = msg.code;
+
+        console.log(`${socket.id}: ${roomName} ${roomCode}`);
+
+
+        // dummy response, actual one will fetch from db
+        let res = {
+            participants: ["Hodaka's ID", "Caden's ID", "Kyle's ID", "Kelvin's ID"],
+            messages: [
+                {
+                    name: "Hodaka's name",
+                    message: "hello everyone",
+                    datetime: "2024-11-21T05:38:48Z"
+                },
+                {
+                    name: "Caden's ID",
+                    message: "nice to meet you",
+                    datetime: "2024-11-21T05:39:41Z"
+                }
+            ]
+        };
+
+        socket.emit("fetchRoom", res);
+    })
 
     socket.on("disconnect", () => {
         console.log("disconnected");
