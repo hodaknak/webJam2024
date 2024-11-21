@@ -4,7 +4,7 @@ import {redirect} from "next/navigation";
 export default function NotFound() {
     return (
         <div className="w-full mt-40 flex justify-center items-center">
-            <FrowningFace/>
+            <WarningIcon/>
             <div id="text">
                 <p className="text-base">
                     Error 404
@@ -21,7 +21,7 @@ export default function NotFound() {
     )
 }
 
-function FrowningFace() {
+function WarningIcon() {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}
              className="size-28 mr-6 stroke-cyan-400">
