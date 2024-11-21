@@ -55,6 +55,9 @@ io.on("connection", (socket) => {
     socket.on("username", (data) => {
         // TODO: verify username, set username in database
         // TODO: if username is the same as someone else, add a "2" (/other number) after it
+
+        // TODO: error handling
+
         if (!("username" in data)) {
             // Invalid
             return;
@@ -68,6 +71,29 @@ io.on("connection", (socket) => {
         data.username
         console.log(`${socket.id} set their username to ${processed}`)
     })
+    
+    socket.on("fetchGame", (msg) => {
+        // object should have code field
+
+        // TODO: fetch from db
+        // TODO: error handling
+
+        let roomCode = msg.code;
+
+        console.log(`${socket.id}: fetching game of code ${roomCode}`);
+
+        // dummy response, actual one will fetch from db
+        let res = {
+            participants: ["Hodaka's ID", "Caden's ID", "Kyle's ID", "Kelvin's ID", "Green's ID", "Red's ID", "Blue's ID"],
+            rooms: [
+                {
+                    name: "A"
+                }
+            ]
+        };
+
+        socket.emit("fetchGame", res);
+    })
 
     socket.on("fetchRoom", (msg) => {
         // object should have name and code field
@@ -75,8 +101,11 @@ io.on("connection", (socket) => {
         let roomName = msg.name;
         let roomCode = msg.code;
 
-        console.log(`${socket.id}: ${roomName} ${roomCode}`);
+        console.log(`${socket.id}: fetching room of name ${roomName} from game of code ${roomCode}`);
 
+        // TODO: fetch from db
+
+        // TODO: error handling
 
         // dummy response, actual one will fetch from db
         let res = {

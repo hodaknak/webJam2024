@@ -10,16 +10,16 @@ const socket = io(URL);
 
 const timezoneOffset = new Date().getTimezoneOffset() * 60000;
 
-const fetchMessages = () => {
+const fetchMessages = (roomName, code) => {
     let data = {
-        name: "A",
-        code: "1234"
+        name: roomName,
+        code: code
     }
 
     socket.emit("fetchRoom", data);
 }
 
-fetchMessages();
+//fetchMessages();
 
 export default function Game() {
     const [messages, setMessages] = useState([]);
@@ -50,6 +50,8 @@ export default function Game() {
             setMessages((prevMessages) => [...prevMessages, msg]);
             console.log(messages);
         })
+
+        fetchMessages(getRoomName(), getGameCode());
     }, []);
 
     const getGameCode = () => {
@@ -61,6 +63,11 @@ export default function Game() {
             return "INVALID CODE!"
         }
         return res;
+    }
+
+    const getRoomName = () => {
+        // Get the room name
+        return "B";
     }
 
     const getParticipantsInRoom = () => {
@@ -126,6 +133,7 @@ export default function Game() {
             <div className="w-full text-center flex flex-col justify-between" style={{height: 'calc(100% - 5rem)'}}>
                 <div className="roundbox">
                     <div>Game code: <span className="codespan">{getGameCode()}</span></div>
+                    <div>Room name: <span className="codespan">{getRoomName()}</span></div>
                     <div>
                         <ul>
                             {getParticipantsInRoom().map((item, index) => (
@@ -135,12 +143,13 @@ export default function Game() {
                     </div>
                 </div>
                 <div style={{"display": "flex", "justifyContent": "center"}}>
-                    <div style={{"maxWidth": "1000px", "minWidth": "100%"}}>
+                    <div style={{"maxWidth": "1000px", "minWidth": "500px"}}>
                         <div hidden={finishedUsername}>
                             What should everyone call you?
                             <br/>
                             <input
                                 className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                                style={{"width": "50%"}}
                                 type="text"
                                 value={username}
                                 placeholder="Enter a username"
