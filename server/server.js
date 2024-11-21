@@ -26,6 +26,7 @@ const io = require("socket.io")(server, {
 io.on("connection", (socket) => {
     console.log("Connection established");
 
+
     // allegedly socket.broadcast can be used to send to all other clients
     // socket.id also seems useful
 
@@ -34,6 +35,36 @@ io.on("connection", (socket) => {
         console.log(socket.id + ': ' + msg);
         io.emit("msg", msg);
     });*/
+  
+    // LIST OF QUERIES
+
+    // These 6 are ran with db.run(). Here is a sample query with the error logging
+    /*db.run(insertGameQuery,data,(err) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log("Game Inserted");
+    }*/
+    const insertGameQuery = "INSERT INTO Game(GameCode, Host, Messages, GameState) VALUES(?, ?, ?, ?)"
+    const insertUserQuery = "INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)"
+    const insertRoomQuery = "INSERT INTO rooms (RoomID,GameCode) Values(?,?)";
+    const removeGameQuery = "DELETE FROM Game WHERE GameCode = ?";
+    const removeUserQuery = "DELETE FROM Users WHERE id = ?"
+    const removeRoomQuery = "DELETE FROM rooms WHERE RoomID = ? AND GameCode = ?"
+
+    // These 3 are ran with db.all(). Here is a sample query with the error logging
+    /*db.all(selectRoomQuery,data,(err,rows) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log("Query result: ", rows);
+      })*/
+    const selectGameQuery = "SELECT * FROM Game where GameCode = ?"
+    const selectUserQuery = "SELECT * FROM Users where id = ?"
+    const selectRoomQuery = "SELECT * FROM rooms where RoomID = ? AND GameCode = ?"
+    const selectAllUsersInRoom = "SELECT * FROM Users where GameCode = ? And BreakoutRoomCode = ?"
+    const selectAllUsersInGame = "SELECT * FROM Users where GameCode = ?"
+    const selectAllRoomsInGame = "SELECT * FROM USers where GameCode = ?"
 
     socket.on("msg", (msg) => {
         let user = socket.id;
@@ -52,7 +83,7 @@ io.on("connection", (socket) => {
         };
 
         io.emit("msg", res);
-    })
+    });
 
     socket.on("username", (data) => {
         // TODO: verify username, set username in database
@@ -72,7 +103,7 @@ io.on("connection", (socket) => {
         }
         data.username
         console.log(`${socket.id} set their username to ${processed}`)
-    })
+    });
 
     socket.on("createGame", (msg) => {
         // Generate the code
@@ -94,7 +125,7 @@ io.on("connection", (socket) => {
             ]*/
         };
         socket.emit("createGame", res);
-    })
+    });
     
     socket.on("fetchGame", (msg) => {
         // object should have code field
@@ -117,10 +148,20 @@ io.on("connection", (socket) => {
         };
 
         socket.emit("fetchGame", res);
-    })
+    });
 
     socket.on("fetchRoom", (msg) => {
         // object should have name and code field
+      
+        if("command" in msg and msg.command === "find room") {
+            const data = [msg.roomcode,msg.gamecode]
+            db.all(selectRoomQuery,data,(err,rows) => {
+                if (err) {
+                  return console.error(err.message);
+                }
+                console.log("Query result: ", rows);
+              })
+        }
 
         let gameCode = msg.code;
 
@@ -150,7 +191,7 @@ io.on("connection", (socket) => {
         };
 
         socket.emit("fetchRoom", res);
-    })
+    });
 
     socket.on("disconnect", () => {
         console.log("disconnected");

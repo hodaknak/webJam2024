@@ -18,9 +18,10 @@ export default function SocketTest() {
 
     const fetchMessages = () => {
         let data = {
-            command: "create room",
-            name: "A",
-            code: "1234"
+            command: "find room",
+            roomcode: "1001",
+            gamecode: "106"
+            
         }
         socket.emit("fetchRoom", data);
     }
