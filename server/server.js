@@ -62,7 +62,10 @@ io.on("connection", (socket) => {
         const selectGameQuery = "SELECT * FROM Game where GameCode = ?"
         const selectUserQuery = "SELECT * FROM Users where id = ?"
         const selectRoomQuery = "SELECT * FROM rooms where RoomID = ? AND GameCode = ?"
-        
+        const selectAllUsersInRoom = "SELECT * FROM Users where GameCode = ? And BreakoutRoomCode = ?"
+        const selectAllUsersInGame = "SELECT * FROM Users where GameCode = ?"
+        const selectAllRoomsInGame = "SELECT * FROM USers where GameCode = ?"
+
 
     socket.on("fetchRoom", (msg) => {
         console.log(`${socket.id}: ${msg.command} ${msg.roomcode} ${msg.gamecode}`);
