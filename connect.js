@@ -23,7 +23,6 @@ db.serialize(() => {
   db.run(
     `CREATE TABLE IF NOT EXISTS Game (
       GameCode INTEGER PRIMARY KEY,
-      RoomList TEXT,
       Host TEXT,
       Messages TEXT,
       GameState TEXT
@@ -38,13 +37,13 @@ db.serialize(() => {
 
   // Data for game table
   const gameArray = [
-    ["104", "Room1, Room2, Room3", "Marcus", "", "Questions"],
-    ["105", "Room1, Room2", "Will", "", "Presenting"],
-    ["106", "Room1", "Daniel", "", "Waiting"]
+    ["104", "Marcus", "", "Questions"],
+    ["105", "Will", "", "Presenting"],
+    ["106", "Daniel", "", "Waiting"]
   ];
 
   // Insert data into game table
-  const insertGameSql = `INSERT INTO Game(GameCode, RoomList, Host, Messages, GameState) VALUES(?, ?, ?, ?, ?)`;
+  const insertGameSql = `INSERT INTO Game(GameCode, Host, Messages, GameState) VALUES(?, ?, ?, ?)`;
   gameArray.forEach((game) => {
     db.run(insertGameSql, game, function (err) {
       if (err) {

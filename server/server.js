@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
                 "",
                 "Waiting"
             ]
-            const insertSql = `INSERT INTO Rooms (GameCode, RoomList, UserList, Host, MessageHistory, GameState) VALUES (?, ?, ?, ?, ?, ?)`;
+            const insertSql = `SELECT * FROM Game`;
             db.run(insertSql,data,function (err) {
                 if (err) {
                   console.error("Error inserting room into database:", err.message);
