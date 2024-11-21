@@ -12,6 +12,8 @@ const io = require("socket.io")(server, {
     }
 });
 
+
+
 //let Server = require("socket.io");
 
 /*const io = new Server(server, {
@@ -160,3 +162,19 @@ server.listen(3001, () => {
 });
 
 //export default io;
+
+
+
+const sqlite3 = require("sqlite3").verbose();
+
+// Creating or connecting to db
+const db = new sqlite3.Database(
+  "./collection.db",
+  sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+  (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log("Connected to the SQlite database.");
+  }
+);
