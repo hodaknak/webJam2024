@@ -12,6 +12,8 @@ const io = require("socket.io")(server, {
     }
 });
 
+
+
 //let Server = require("socket.io");
 
 /*const io = new Server(server, {
@@ -34,32 +36,19 @@ io.on("connection", (socket) => {
     });*/
 
     socket.on("fetchRoom", (msg) => {
-        // object should have name and code field
-
-        let roomName = msg.name;
-        let roomCode = msg.code;
-
-        console.log(`${socket.id}: ${roomName} ${roomCode}`);
-
-
-        // dummy response, actual one will fetch from db
-        let res = {
-            participants: ["Hodaka's ID", "Caden's ID", "Kyle's ID", "Kelvin's ID"],
-            messages: [
-                {
-                    name: "Hodaka's name",
-                    message: "hello everyone",
-                    datetime: "2024-11-21T05:38:48Z"
-                },
-                {
-                    name: "Caden's ID",
-                    message: "nice to meet you",
-                    datetime: "2024-11-21T05:39:41Z"
+        console.log(`${socket.id}: ${msg.command} ${msg.name} ${msg}`);
+        if(msg.command === "create room") {
+            const insertRoomQuery = "INSERT INTO rooms (RoomID,GameCode) Values(?,?)";
+            const data = [msg.name,msg.code]
+            console.log("I made it here")
+            db.run(insertRoomQuery,data,(err) => {
+                if (err) {
+                  return console.error(err.message);
                 }
-            ]
-        };
+                console.log("Inserted into Rooms Table");
+              })
+        }
 
-        socket.emit("fetchRoom", res);
     })
 
     socket.on("disconnect", () => {
@@ -72,3 +61,19 @@ server.listen(3001, () => {
 });
 
 //export default io;
+
+
+
+const sqlite3 = require("sqlite3").verbose();
+
+// Creating or connecting to db
+const db = new sqlite3.Database(
+  "./collection.db",
+  sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+  (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log("Connected to the SQlite database.");
+  }
+);
