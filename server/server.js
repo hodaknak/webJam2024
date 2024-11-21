@@ -120,17 +120,18 @@ io.on("connection", (socket) => {
     socket.on("fetchRoom", (msg) => {
         // object should have name and code field
 
-        let roomName = msg.name;
-        let roomCode = msg.code;
+        let gameCode = msg.code;
 
-        console.log(`${socket.id}: fetching room of name ${roomName} from game of code ${roomCode}`);
+        // TODO: fetch the room name, the participants in the room, and the messages in the room from db (based on the user's socket ID)
+        let roomName = "C";
 
-        // TODO: fetch from db
+        console.log(`${socket.id}: fetching room of name ${roomName} from game of code ${gameCode}`);
 
         // TODO: error handling
 
         // dummy response, actual one will fetch from db
         let res = {
+            roomName: roomName,
             participants: ["Hodaka's ID", "Caden's ID", "Kyle's ID", "Kelvin's ID"],
             messages: [
                 {

@@ -41,6 +41,8 @@ export default function Host() {
         });
 
         socket.emit("createGame", {});
+
+        //return () => socket.off("createGame"); // Needed to clean up?
     }, []);
 
     const getParticipants = () => {

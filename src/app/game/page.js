@@ -10,9 +10,9 @@ const socket = io(URL);
 
 const timezoneOffset = new Date().getTimezoneOffset() * 60000;
 
-const fetchMessages = (roomName, code) => {
+const fetchRoom = (roomName, code) => {
     let data = {
-        name: roomName,
+        //name: roomName, // We won't have access to this: fetchRoom is supposed to give it to us
         code: code
     }
 
@@ -27,6 +27,7 @@ export default function Game() {
     const [username, setUsername] = useState("");
     const [finishedUsername, setFinishedUsername] = useState(false);
     const [participants, setParticipants] = useState([]);
+    const [roomName, setRoomName] = useState("");
 
     const pathname = usePathname()
     const params = useSearchParams()
@@ -41,17 +42,19 @@ export default function Game() {
         socket.on("fetchRoom", (msg) => {
             setMessages(msg.messages);
             setParticipants(msg.participants);
+            setRoomName(msg.roomName);
         });
 
         socket.on("msg", (msg) => {
-            // TODO: add the message(s)
-
-            console.log(msg);
+            console.log(`Received message: ${msg}`);
+            // Add the new message
             setMessages((prevMessages) => [...prevMessages, msg]);
             console.log(messages);
         })
 
-        fetchMessages(getRoomName(), getGameCode());
+        fetchRoom(getRoomName(), getGameCode());
+
+        //return () => socket.off("fetchRoom"); // Needed to clean up?
     }, []);
 
     const getGameCode = () => {
@@ -67,7 +70,7 @@ export default function Game() {
 
     const getRoomName = () => {
         // Get the room name
-        return "B";
+        return roomName;
     }
 
     const getParticipantsInRoom = () => {
