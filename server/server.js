@@ -1,16 +1,25 @@
-import http from "http";
+let http = require("http");
 const server = http.createServer((req, res) => {
    // handle http requests if needed
 });
 
-import { Server } from "socket.io";
+// Using CommonJS
 
-const io = new Server(server, {
+const io = require("socket.io")(server, {
     cors: {
         origin: "*",
         method: ["GET", "POST"]
     }
 });
+
+//let Server = require("socket.io");
+
+/*const io = new Server(server, {
+    cors: {
+        origin: "*",
+        method: ["GET", "POST"]
+    }
+});*/
 
 io.on("connection", (socket) => {
     console.log("Connection established");
@@ -32,4 +41,4 @@ server.listen(3001, () => {
     console.log("WebSocket server listening on port 3001");//
 });
 
-export default io;
+//export default io;

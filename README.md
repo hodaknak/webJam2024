@@ -1,43 +1,36 @@
+# WebJam 2024
 
-## Getting Started
+## Purpose
+We're hoping to streamline the process of icebreakers for physical and online meetings into a fun, simple app!
 
-First, run the development server:
+## Getting started (development)
 
+First, ensure everything is installed:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
 
-On a separate shell, run:
+Run the development server for the client side:
+```bash
+npm run dev
+```
+
+On a separate shell, run the server side:
 ```bash
 node server/server.js
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Pages auto-update as you edit the files.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+## Usage (for users)
 
-To learn more about Next.js, take a look at the following resources:
+Host: just go to the homepage, click `Create a game`, and give all participants the room code. You will not be able to participate yourself, but you will be able to monitor who has joined.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Participant: just go to the homepage, enter the room code in the box, and click `Join game`.
 
 ## Credits
 This was created for the ICSSC WebJam 2024 at UCI by Caden Lee, Hodaka Nakamura, Kelvin Wu, and Kyle Kim.
