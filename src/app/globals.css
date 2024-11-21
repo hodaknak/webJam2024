@@ -29,8 +29,7 @@ body {
 }
 
 .messagebox {
-    font-size: 20px;
-    text-align: center;
+    font-size: 16px;
     background-color: rgb(228, 233, 237);
     border-radius: 4px;
     height: 36px;
