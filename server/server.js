@@ -153,7 +153,7 @@ io.on("connection", (socket) => {
     socket.on("fetchRoom", (msg) => {
         // object should have name and code field
       
-        if("command" in msg and msg.command === "find room") {
+        if("command" in msg && msg.command === "find room") {
             const data = [msg.roomcode,msg.gamecode]
             db.all(selectRoomQuery,data,(err,rows) => {
                 if (err) {
