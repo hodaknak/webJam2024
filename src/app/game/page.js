@@ -26,6 +26,7 @@ export default function Game() {
     const [fieldText, setFieldText] = useState("");
     const [username, setUsername] = useState("");
     const [finishedUsername, setFinishedUsername] = useState(false);
+    const [participants, setParticipants] = useState([]);
 
     const pathname = usePathname()
     const params = useSearchParams()
@@ -39,6 +40,7 @@ export default function Game() {
     useEffect(() => {
         socket.on("fetchRoom", (msg) => {
             setMessages(msg.messages);
+            setParticipants(msg.participants);
         });
 
         socket.on("msg", (msg) => {
@@ -64,7 +66,7 @@ export default function Game() {
     const getParticipantsInRoom = () => {
         // Get a list of all the participants in the current room
         // TODO: actually get the participants from the server
-        let res = ["P1", "P2", "P3"];
+        let res = participants;
         return res;
     }
 
@@ -122,56 +124,59 @@ export default function Game() {
         <>
             <style>{'html, body { height: 100%; margin: 0; }'}</style>
             <div className="w-full text-center flex flex-col justify-between" style={{height: 'calc(100% - 5rem)'}}>
-                <br/>
-                <div>Game code: <span className="codespan">{getGameCode()}</span></div>
-                <div>
-                    <ul>
-                        {getParticipantsInRoom().map((item, index) => (
-                            <span style={{"margin": "10px"}} key={index}> {item} </span>
-                        ))}
-                    </ul>
-                </div>
-                <div style={{"width": "50%"}}>
-                    <div hidden={finishedUsername}>
-                        What should everyone call you?
-                        <br/>
-                        <input
-                            className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-                            type="text"
-                            value={username}
-                            placeholder="Enter a username"
-                            onChange={(e) => setUsername(e.target.value)}
-                            onKeyDown={usernameKeyDown}
-                            autoFocus={true}
-                        />
-                        <br/>
-                        <button onClick={submitUsername}>Join</button>
-                        <div style={{"height": "50%"}}>
-                        </div>
-                        <br/>
-                    </div>
-                    <div hidden={!finishedUsername}>
-                        <p className="text-xl mt-16">
-                            Your question is:
-                            <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
-                        </p>
-                        <br/>
-                        <div className="flex flex-col justify-end flex-grow border-t-4 border-t-sky-400 mb-4">
-                            <br/>
-                            {messages.map((msg, index) => (
-                                <div key={index} className={msg.name == username ? "yourmessage" : ""}>{msg.datetime} {msg.name}: {msg.message}</div>
+                <div className="roundbox">
+                    <div>Game code: <span className="codespan">{getGameCode()}</span></div>
+                    <div>
+                        <ul>
+                            {getParticipantsInRoom().map((item, index) => (
+                                <span style={{"margin": "10px"}} key={index}> {item} </span>
                             ))}
-                        </div>
-                        <div className="roundbox">
+                        </ul>
+                    </div>
+                </div>
+                <div style={{"display": "flex", "justifyContent": "center"}}>
+                    <div style={{"maxWidth": "1000px", "minWidth": "100%"}}>
+                        <div hidden={finishedUsername}>
+                            What should everyone call you?
+                            <br/>
                             <input
                                 className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
                                 type="text"
-                                value={fieldText}
-                                placeholder="What are your thoughts?"
-                                onChange={(e) => setFieldText(e.target.value)}
-                                onKeyDown={keyDown}
+                                value={username}
+                                placeholder="Enter a username"
+                                onChange={(e) => setUsername(e.target.value)}
+                                onKeyDown={usernameKeyDown}
+                                autoFocus={true}
                             />
-                            <button onClick={sendMessage}>send</button>
+                            <br/>
+                            <button onClick={submitUsername}>Join</button>
+                            <div style={{"height": "50%"}}>
+                            </div>
+                            <br/>
+                        </div>
+                        <div hidden={!finishedUsername}>
+                            <p className="text-xl mt-16">
+                                Your question is:
+                                <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
+                            </p>
+                            <br/>
+                            <div className="flex flex-col justify-end flex-grow border-t-4 border-t-sky-400 mb-4">
+                                <br/>
+                                {messages.map((msg, index) => (
+                                    <div key={index} className={msg.name == username ? "yourmessage" : ""}>{msg.datetime} {msg.name}: {msg.message}</div>
+                                ))}
+                            </div>
+                            <div className="roundbox">
+                                <input
+                                    className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                                    type="text"
+                                    value={fieldText}
+                                    placeholder="What are your thoughts?"
+                                    onChange={(e) => setFieldText(e.target.value)}
+                                    onKeyDown={keyDown}
+                                />
+                                <button onClick={sendMessage}>send</button>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -49,13 +49,24 @@ io.on("connection", (socket) => {
             datetime: datetime
         };
 
-        socket.broadcast.emit("msg", res);
+        io.emit("msg", res);
     })
 
     socket.on("username", (data) => {
         // TODO: verify username, set username in database
         // TODO: if username is the same as someone else, add a "2" (/other number) after it
+        if (!("username" in data)) {
+            // Invalid
+            return;
+        }
+        let processed = "Unnamed User";
+        if (data.username.length == 0 || data.username.length > 200) {
+            processed = "Unnamed User";
+        } else {
+            processed = data.username;
+        }
         data.username
+        console.log(`${socket.id} set their username to ${processed}`)
     })
 
     socket.on("fetchRoom", (msg) => {
