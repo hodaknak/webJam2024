@@ -14,7 +14,7 @@
 11. If you could instantly learn a new talent, what would it be?
 12. How is GIF pronounced?
 13. Is a hotdog a sandwich?
-14. What are your biggest phobias?
+14. What is your preferred electronic device?
 15. What clubs have you participated in?
 16. What is something you hate doing?
 17. What is something you love doing?
@@ -54,7 +54,19 @@
 51. How many languages can you speak?
 52. What animal would you chose to be?
 53. Name one good and one bad thing about yourself.
-54. 
+54. How long do you tend to sleep?
+55. What would you like to do when you retire?
+56. What would you do if you got a million dollars?
+57. What do you want to do when you retire?
+58. When did you first get a phone?
+59. What's your favorite piece of advice?
+60. Pens or pencils?
+61. What did adults say would be really important when you grew up, but it hasn't been?
+62. What's something you're looking forward to?
+63. What's your favorite type of weather?
+64. What's your favorite animal?
+65. When are you most productive?
+66. What's your favorite meal?
 
 ## The following are original questions
 1. What is your preferred water?
@@ -73,4 +85,21 @@
 14. What are your favorite icebreaker questions?
 15. What are your least favorite icebreaker questions?
 16. What are some good icebreaker questions?
-17. 
+17. What is your least favorite chore?
+18. When do you typically wake up?
+19. Favorite snack?
+20. What is an overrated food item?
+21. How long do you or did you spend on schoolwork a day?
+22. Most important/favorite food group? (Grain, Protein, Fruits, Vegetables, Dairy)
+23. If life expectancy weren't a concern, how long would you want to live for?
+24. Favorite fast-food chain?
+25. Would you rather know the future, or the past?
+26. Do you prefer working digitally or on paper?
+27. How many social media platforms do you use regularly?
+28. What is a bad habit you'd like to end?
+29. What's the dumbest thing you've heard anyone say?
+30. What's the dumbest thing you've ever believed?
+31. Do you like icebreakers?
+32. What's your favorite homemade meal?
+33. Where did you grow up?
+34. Are there any habits that you'd like to build?
