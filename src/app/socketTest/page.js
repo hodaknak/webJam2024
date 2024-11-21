@@ -30,6 +30,8 @@ export default function SocketTest() {
             <div className="flex justify-center ">
                 <button onClick={fetchMessages}>request room data</button>
             </div>
+            <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+            <div>hello</div>
         </div>
     )
 }

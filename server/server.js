@@ -33,6 +33,25 @@ io.on("connection", (socket) => {
         io.emit("msg", msg);
     });*/
 
+    socket.on("msg", (msg) => {
+        let user = socket.id;
+        let message = msg.message;
+        let datetime = msg.datetime;
+
+        console.log(`${user}: ${message} ${datetime}`);
+
+        // add message to database
+        // fetch name from database
+
+        let res = {
+            name: `whoever ${user} is`,
+            message: message,
+            datetime: datetime
+        };
+
+        socket.broadcast.emit("msg", res);
+    })
+
     socket.on("fetchRoom", (msg) => {
         // object should have name and code field
 
@@ -47,14 +66,14 @@ io.on("connection", (socket) => {
             participants: ["Hodaka's ID", "Caden's ID", "Kyle's ID", "Kelvin's ID"],
             messages: [
                 {
-                    name: "Hodaka's name",
+                    name: "Hodaka",
                     message: "hello everyone",
-                    datetime: "2024-11-21T05:38:48Z"
+                    datetime: "5:38"
                 },
                 {
-                    name: "Caden's ID",
+                    name: "Caden",
                     message: "nice to meet you",
-                    datetime: "2024-11-21T05:39:41Z"
+                    datetime: "5:39"
                 }
             ]
         };

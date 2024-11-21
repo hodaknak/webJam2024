@@ -4,9 +4,10 @@ export default function Sidebar({isOpen, toggle}) {
     return (
         <>
             <div
-                className="sidebar-container w-full overflow-hidden justify-center bg-gray-50 grid left-0 z-10 md:hidden"
+                className="sidebar-container w-full overflow-hidden justify-center bg-gray-50 left-0 z-10 md:hidden"
                 style={{
                     opacity: `${isOpen ? 1 : 0}`,
+                    display: `${isOpen ? 'grid' : 'none'}`,
                     top: `${isOpen ? 0 : "-100%"}`,
                 }}
             >
