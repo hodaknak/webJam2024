@@ -8,15 +8,44 @@ const URL = "http://localhost:3001";
 
 const socket = io(URL);
 
+const timezoneOffset = new Date().getTimezoneOffset() * 60000;
+
+const fetchMessages = () => {
+    let data = {
+        name: "A",
+        code: "1234"
+    }
+
+    socket.emit("fetchRoom", data);
+}
+
+fetchMessages();
+
 export default function Game() {
+    const [messages, setMessages] = useState([]);
+    const [fieldText, setFieldText] = useState("");
+
     const pathname = usePathname()
     const params = useSearchParams()
 
+    // how this will work: every time a message is sent to the server, add the message to the client's local message history
+    // so we don't have to fetch from the database every time. The server will broadast the message to every other client so
+    // they can do the same
+    // the database will only be used when a new user joins the room, and has to fetch all the past messages
+    // so we fetch the messages from database here
+
     useEffect(() => {
+        socket.on("fetchRoom", (msg) => {
+            setMessages(msg.messages);
+        });
+
         socket.on("msg", (msg) => {
             //setLatestMsg(msg);
             // TODO: add the message(s)
+
             console.log(msg);
+            setMessages((prevMessages) => [...prevMessages, msg]);
+            console.log(messages);
         })
     }, []);
 
@@ -38,63 +67,70 @@ export default function Game() {
         return res;
     }
 
-    return (
-        <div className="w-full text-center">
-            <br/>
-            Game code: <span className="codespan">{getGameCode()}</span>
-            <div>
-                <ul>
-                {getParticipantsInRoom().map((item, index) => (
-                    <span style={{"margin": "10px"}} key={index}> {item} </span>
-                ))}
-                </ul>
-            </div>
-            <p className="text-xl mt-20">
-                Your question is:
-                <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
-            </p>
-            <br/>
-            <br/>
-            <MessageBox/>
-            <p className="m-40">
-                Welcome to the room!
-            </p>
-        </div>
-    );
-}
-
-function MessageBox() {
-    const [fieldText, setFieldText] = useState("");
-
     const sendMessage = () => {
         // Try to send the message
         // Valid?
-        if (fieldText.length == 0) {
+        if (fieldText.length === 0) {
             return;
         }
-        console.log(fieldText);
-        socket.emit("msg", fieldText);
+
+        let hourminute = new Date();
+
+        let data = {
+            name: "guest", // the server doesn't actually need this, just put whatever is stored locally
+            message: fieldText,
+            datetime: `${hourminute.getHours()}:${hourminute.getMinutes()}`
+        }
+
+        socket.emit("msg", data);
         setFieldText("")
+
+        setMessages((prevMessages) => [...prevMessages, data]);
     }
 
     const keyDown = (event) => {
         const key = event.key;
-        if (key == "Enter") {
+        if (key === "Enter") {
             sendMessage();
         }
     }
 
     return (
-        <div className="roundbox">
-            <input
-            className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-            type="text"
-            value={fieldText}
-            placeholder="What are your thoughts?"
-            onChange={(e) => setFieldText(e.target.value)}
-            onKeyDown={keyDown}
-        />
-            <button onClick={sendMessage}>send</button>
-        </div>
-    )
+        <>
+            <style>{'html, body { height: 100%; margin: 0; }'}</style>
+            <div className="w-full text-center flex flex-col justify-between" style={{height: 'calc(100% - 5rem)'}}>
+                <br/>
+                <div>Game code: <span className="codespan">{getGameCode()}</span></div>
+                <div>
+                    <ul>
+                        {getParticipantsInRoom().map((item, index) => (
+                            <span style={{"margin": "10px"}} key={index}> {item} </span>
+                        ))}
+                    </ul>
+                </div>
+                <p className="text-xl mt-16">
+                    Your question is:
+                    <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
+                </p>
+                <br/>
+                <div className="flex flex-col justify-end flex-grow border-t-4 border-t-sky-400 mb-4">
+                    <br/>
+                    {messages.map((msg, index) => (
+                        <div key={index}>{msg.datetime} {msg.name}: {msg.message}</div>
+                    ))}
+                </div>
+                <div className="roundbox">
+                    <input
+                        className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                        type="text"
+                        value={fieldText}
+                        placeholder="What are your thoughts?"
+                        onChange={(e) => setFieldText(e.target.value)}
+                        onKeyDown={keyDown}
+                    />
+                    <button onClick={sendMessage}>send</button>
+                </div>
+            </div>
+        </>
+    );
 }
