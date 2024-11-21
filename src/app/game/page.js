@@ -24,6 +24,8 @@ fetchMessages();
 export default function Game() {
     const [messages, setMessages] = useState([]);
     const [fieldText, setFieldText] = useState("");
+    const [username, setUsername] = useState("");
+    const [finishedUsername, setFinishedUsername] = useState(false);
 
     const pathname = usePathname()
     const params = useSearchParams()
@@ -40,7 +42,6 @@ export default function Game() {
         });
 
         socket.on("msg", (msg) => {
-            //setLatestMsg(msg);
             // TODO: add the message(s)
 
             console.log(msg);
@@ -77,21 +78,43 @@ export default function Game() {
         let hourminute = new Date();
 
         let data = {
-            name: "guest", // the server doesn't actually need this, just put whatever is stored locally
+            name: username, // the server doesn't actually need this, just put whatever is stored locally
             message: fieldText,
             datetime: `${hourminute.getHours()}:${hourminute.getMinutes()}`
-        }
+        };
 
         socket.emit("msg", data);
         setFieldText("")
 
-        setMessages((prevMessages) => [...prevMessages, data]);
+        // The following line is unnecessary since the server should re-emit the processed message to all members of the room (including the sender)
+        //setMessages((prevMessages) => [...prevMessages, data]);
+    }
+
+    const submitUsername = () => {
+        if (username.length == 0) {
+            // Invalid username
+            return;
+        }
+        setFinishedUsername(true);
+        // TODO: submit the username
+        let data = {
+            username: username
+        };
+        socket.emit("username", data);
+        // TODO: update the current username based on the result
     }
 
     const keyDown = (event) => {
         const key = event.key;
         if (key === "Enter") {
             sendMessage();
+        }
+    }
+
+    const usernameKeyDown = (event) => {
+        const key = event.key;
+        if (key === "Enter") {
+            submitUsername();
         }
     }
 
@@ -108,27 +131,49 @@ export default function Game() {
                         ))}
                     </ul>
                 </div>
-                <p className="text-xl mt-16">
-                    Your question is:
-                    <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
-                </p>
-                <br/>
-                <div className="flex flex-col justify-end flex-grow border-t-4 border-t-sky-400 mb-4">
-                    <br/>
-                    {messages.map((msg, index) => (
-                        <div key={index}>{msg.datetime} {msg.name}: {msg.message}</div>
-                    ))}
-                </div>
-                <div className="roundbox">
-                    <input
-                        className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-                        type="text"
-                        value={fieldText}
-                        placeholder="What are your thoughts?"
-                        onChange={(e) => setFieldText(e.target.value)}
-                        onKeyDown={keyDown}
-                    />
-                    <button onClick={sendMessage}>send</button>
+                <div style={{"width": "50%"}}>
+                    <div hidden={finishedUsername}>
+                        What should everyone call you?
+                        <br/>
+                        <input
+                            className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                            type="text"
+                            value={username}
+                            placeholder="Enter a username"
+                            onChange={(e) => setUsername(e.target.value)}
+                            onKeyDown={usernameKeyDown}
+                            autoFocus={true}
+                        />
+                        <br/>
+                        <button onClick={submitUsername}>Join</button>
+                        <div style={{"height": "50%"}}>
+                        </div>
+                        <br/>
+                    </div>
+                    <div hidden={!finishedUsername}>
+                        <p className="text-xl mt-16">
+                            Your question is:
+                            <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
+                        </p>
+                        <br/>
+                        <div className="flex flex-col justify-end flex-grow border-t-4 border-t-sky-400 mb-4">
+                            <br/>
+                            {messages.map((msg, index) => (
+                                <div key={index} className={msg.name == username ? "yourmessage" : ""}>{msg.datetime} {msg.name}: {msg.message}</div>
+                            ))}
+                        </div>
+                        <div className="roundbox">
+                            <input
+                                className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
+                                type="text"
+                                value={fieldText}
+                                placeholder="What are your thoughts?"
+                                onChange={(e) => setFieldText(e.target.value)}
+                                onKeyDown={keyDown}
+                            />
+                            <button onClick={sendMessage}>send</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </>

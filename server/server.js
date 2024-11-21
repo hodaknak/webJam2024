@@ -40,8 +40,8 @@ io.on("connection", (socket) => {
 
         console.log(`${user}: ${message} ${datetime}`);
 
-        // add message to database
-        // fetch name from database
+        // TODO: add message to database
+        // TODO: fetch name from database
 
         let res = {
             name: `whoever ${user} is`,
@@ -50,6 +50,12 @@ io.on("connection", (socket) => {
         };
 
         socket.broadcast.emit("msg", res);
+    })
+
+    socket.on("username", (data) => {
+        // TODO: verify username, set username in database
+        // TODO: if username is the same as someone else, add a "2" (/other number) after it
+        data.username
     })
 
     socket.on("fetchRoom", (msg) => {
