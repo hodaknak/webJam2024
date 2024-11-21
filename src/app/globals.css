@@ -49,6 +49,11 @@ body {
     width: 80%;
 }
 
+.yourmessage {
+    background-color: rgb(105, 208, 255);
+    border-radius: 4px;
+}
+
 .codebox:focus {
     outline: solid 2px rgb(105, 208, 255);
 }

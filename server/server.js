@@ -40,8 +40,8 @@ io.on("connection", (socket) => {
 
         console.log(`${user}: ${message} ${datetime}`);
 
-        // add message to database
-        // fetch name from database
+        // TODO: add message to database
+        // TODO: fetch name from database
 
         let res = {
             name: `whoever ${user} is`,
@@ -49,20 +49,89 @@ io.on("connection", (socket) => {
             datetime: datetime
         };
 
-        socket.broadcast.emit("msg", res);
+        io.emit("msg", res);
+    })
+
+    socket.on("username", (data) => {
+        // TODO: verify username, set username in database
+        // TODO: if username is the same as someone else, add a "2" (/other number) after it
+
+        // TODO: error handling
+
+        if (!("username" in data)) {
+            // Invalid
+            return;
+        }
+        let processed = "Unnamed User";
+        if (data.username.length == 0 || data.username.length > 200) {
+            processed = "Unnamed User";
+        } else {
+            processed = data.username;
+        }
+        data.username
+        console.log(`${socket.id} set their username to ${processed}`)
+    })
+
+    socket.on("createGame", (msg) => {
+        // Generate the code
+        // TODO: check for clashes with the database and regenerate if that is the case
+        // TODO: what happens if every code is used up?
+        let newGameCode = "";
+        for (let i = 0; i < 4; i++) {
+            newGameCode += String.fromCharCode(('a'.charCodeAt(0) + Math.floor(Math.random() * 26)))
+        }
+        console.log(`${socket.id}: creating game of code ${newGameCode}`);
+        // TODO: error handling
+        // Return the result
+        let res = {
+            code: newGameCode,
+            /*rooms: [
+                {
+                    name: "A"
+                }
+            ]*/
+        };
+        socket.emit("createGame", res);
+    })
+    
+    socket.on("fetchGame", (msg) => {
+        // object should have code field
+
+        // TODO: fetch from db
+        // TODO: error handling
+
+        let roomCode = msg.code;
+
+        console.log(`${socket.id}: fetching game of code ${roomCode}`);
+
+        // dummy response, actual one will fetch from db
+        let res = {
+            participants: ["Hodaka's ID", "Caden's ID", "Kyle's ID", "Kelvin's ID", "Green's ID", "Red's ID", "Blue's ID"],
+            rooms: [
+                {
+                    name: "A"
+                }
+            ]
+        };
+
+        socket.emit("fetchGame", res);
     })
 
     socket.on("fetchRoom", (msg) => {
         // object should have name and code field
 
-        let roomName = msg.name;
-        let roomCode = msg.code;
+        let gameCode = msg.code;
 
-        console.log(`${socket.id}: ${roomName} ${roomCode}`);
+        // TODO: fetch the room name, the participants in the room, and the messages in the room from db (based on the user's socket ID)
+        let roomName = "C";
 
+        console.log(`${socket.id}: fetching room of name ${roomName} from game of code ${gameCode}`);
+
+        // TODO: error handling
 
         // dummy response, actual one will fetch from db
         let res = {
+            roomName: roomName,
             participants: ["Hodaka's ID", "Caden's ID", "Kyle's ID", "Kelvin's ID"],
             messages: [
                 {
