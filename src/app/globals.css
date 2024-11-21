@@ -33,6 +33,7 @@ body {
     background-color: rgb(228, 233, 237);
     border-radius: 4px;
     height: 36px;
+    width: 75%;
 }
 
 .messagebox:focus {
@@ -46,6 +47,11 @@ body {
     background-color: rgb(228, 233, 237);
     border-radius: 4px;
     width: 80%;
+}
+
+.yourmessage {
+    background-color: rgb(105, 208, 255);
+    border-radius: 4px;
 }
 
 .codebox:focus {

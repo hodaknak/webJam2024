@@ -74,6 +74,7 @@ function CreateBox() {
         // Try to submit the create request
         console.log("Submitting the create request...")
         // TODO: impl
+        redirect("/host")
     }
     return (
         <div className="roundbox">
