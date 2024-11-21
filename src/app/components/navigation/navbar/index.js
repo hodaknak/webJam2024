@@ -18,11 +18,6 @@ export default function Navbar({toggle}) {
                                     <p className="link link-underline">Home</p>
                                 </Link>
                             </li>
-                            <li>
-                                <Link href="/page2">
-                                    <p className="link link-underline">Page 2</p>
-                                </Link>
-                            </li>
                         </ul>
 
                         <button type="button" className="inline-flex items-center md:hidden" onClick={toggle}>

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
 
-export default function Page1() {
+export default function Index() {
     // TODO: connect to the server to verify that the game code exists before allowing the user to join
     // TODO: allow the user to actually join/create the game: send them to the game page and do the necessary updates on the server (ex. setting them as the host)
     return (
@@ -57,7 +57,7 @@ function JoinBox() {
         // Try to submit the join request with the code
         console.log("Submitting the join request with code `" + currentCode + "`...")
         // TODO: impl
-        redirect(`/page2?code=${currentCode}`)
+        redirect(`/game?code=${currentCode}`)
     }
     return (
         <div className="roundbox">

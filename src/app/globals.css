@@ -19,6 +19,27 @@ body {
   background: var(--background);
 }
 
+.codespan {
+    font-family: monospace;
+    padding: 2px;
+    padding-left: 6px;
+    padding-right: 6px;
+    background-color: rgb(228, 233, 237);
+    margin: 2px;
+}
+
+.messagebox {
+    font-size: 20px;
+    text-align: center;
+    background-color: rgb(228, 233, 237);
+    border-radius: 4px;
+    height: 36px;
+}
+
+.messagebox:focus {
+    outline: solid 2px rgb(105, 208, 255);
+}
+
 .codebox {
     font-family: monospace;
     font-size: 20px;
