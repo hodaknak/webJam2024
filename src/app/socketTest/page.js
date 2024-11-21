@@ -9,32 +9,26 @@ const socket = io("http://localhost:3001");
 
 export default function SocketTest() {
     const [latestMsg, setLatestMsg] = useState("null");
-    const [fieldText, setFieldText] = useState("");
 
     useEffect(() => {
-        socket.on("msg", (msg) => {
-            setLatestMsg(msg);
+        socket.on("fetchRoom", (msg) => {
             console.log(msg);
         })
     }, []);
 
-    const sendMessage = () => {
-        console.log(fieldText);
-        socket.emit("msg", fieldText);
-        setFieldText("")
+    const fetchMessages = () => {
+        let data = {
+            name: "A",
+            code: "1234"
+        }
+        socket.emit("fetchRoom", data);
     }
 
     return (
         <div className="w-full text-center">
             <p className="m-40">{latestMsg}</p>
             <div className="flex justify-center ">
-                <input
-                    className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-                    type="text"
-                    value={fieldText}
-                    onChange={(e) => setFieldText(e.target.value)}
-                />
-                <button onClick={sendMessage}>send</button>
+                <button onClick={fetchMessages}>request room data</button>
             </div>
         </div>
     )
