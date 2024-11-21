@@ -16,22 +16,31 @@ const fetchGame = () => {
     socket.emit("fetchGame", data);
 }
 
-fetchGame();
-
 export default function Host() {
     // TODO: connect to the server to get the generated game code and start the game
 
     const [participants, setParticipants] = useState([])
+    const [gameCode, setGameCode] = useState("")
 
     let getGameCode = () => {
         // TODO: get the unique one-time game code based on the current user's connection
-        return "In progress..."
+        if (gameCode.length == 0) {
+            return "In progress..."
+        } else {
+            return gameCode;
+        }
     }
 
     useEffect(() => {
         socket.on("fetchGame", (msg) => {
             setParticipants(msg.participants);
         });
+
+        socket.on("createGame", (msg) => {
+            setGameCode(msg.code);
+        });
+
+        socket.emit("createGame", {});
     }, []);
 
     const getParticipants = () => {

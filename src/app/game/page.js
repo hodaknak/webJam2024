@@ -164,6 +164,7 @@ export default function Game() {
                             <br/>
                         </div>
                         <div hidden={!finishedUsername}>
+                            {/* TODO: Provide some instructions */}
                             <p className="text-xl mt-16">
                                 Your question is:
                                 <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>

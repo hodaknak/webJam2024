@@ -71,6 +71,28 @@ io.on("connection", (socket) => {
         data.username
         console.log(`${socket.id} set their username to ${processed}`)
     })
+
+    socket.on("createGame", (msg) => {
+        // Generate the code
+        // TODO: check for clashes with the database and regenerate if that is the case
+        // TODO: what happens if every code is used up?
+        let newGameCode = "";
+        for (let i = 0; i < 4; i++) {
+            newGameCode += String.fromCharCode(('a'.charCodeAt(0) + Math.floor(Math.random() * 26)))
+        }
+        console.log(`${socket.id}: creating game of code ${newGameCode}`);
+        // TODO: error handling
+        // Return the result
+        let res = {
+            code: newGameCode,
+            /*rooms: [
+                {
+                    name: "A"
+                }
+            ]*/
+        };
+        socket.emit("createGame", res);
+    })
     
     socket.on("fetchGame", (msg) => {
         // object should have code field
