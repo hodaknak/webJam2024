@@ -8,32 +8,16 @@ const URL = "http://localhost:3001";
 
 const socket = io(URL);
 
-export default function Game() {
-    const pathname = usePathname()
-    const params = useSearchParams()
+export default function Host() {
+    // TODO: connect to the server to get the generated game code and start the game
 
-    useEffect(() => {
-        socket.on("msg", (msg) => {
-            //setLatestMsg(msg);
-            // TODO: add the message(s)
-            console.log(msg);
-        })
-    }, []);
-
-    const getGameCode = () => {
-        // Get the room code
-        let res = params.get("code");
-        if (res == null) {
-            // Invalid
-            // TODO: what to do if it does not exist
-            return "INVALID CODE!"
-        }
-        return res;
+    let getGameCode = () => {
+        // TODO: get the unique one-time room code based on the current user's connection
+        return "In progress..."
     }
 
-    const getParticipantsInRoom = () => {
+    const getParticipants = () => {
         // Get a list of all the participants in the current room
-        // TODO: actually get the participants from the server
         let res = ["P1", "P2", "P3"];
         return res;
     }
@@ -44,44 +28,31 @@ export default function Game() {
             Game code: <span className="codespan">{getGameCode()}</span>
             <div>
                 <ul>
-                {getParticipantsInRoom().map((item, index) => (
+                {getParticipants().map((item, index) => (
                     <span style={{"margin": "10px"}} key={index}> {item} </span>
                 ))}
                 </ul>
             </div>
             <p className="text-xl mt-20">
-                Your question is:
-                <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
+                You are the host! Give this game code to your participants so they can join.
+                <br/>Don't reload this page.
             </p>
             <br/>
-            <br/>
-            <MessageBox/>
+            {/* TODO: List of participants */}
             <p className="m-40">
-                Welcome to the room!
+                Welcome to the game!
             </p>
         </div>
     );
 }
 
-function MessageBox() {
+/*function MessageBox() {
     const [fieldText, setFieldText] = useState("");
 
     const sendMessage = () => {
-        // Try to send the message
-        // Valid?
-        if (fieldText.length == 0) {
-            return;
-        }
         console.log(fieldText);
         socket.emit("msg", fieldText);
         setFieldText("")
-    }
-
-    const keyDown = (event) => {
-        const key = event.key;
-        if (key == "Enter") {
-            sendMessage();
-        }
     }
 
     return (
@@ -90,11 +61,9 @@ function MessageBox() {
             className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
             type="text"
             value={fieldText}
-            placeholder="What are your thoughts?"
             onChange={(e) => setFieldText(e.target.value)}
-            onKeyDown={keyDown}
         />
             <button onClick={sendMessage}>send</button>
         </div>
     )
-}
+}*/

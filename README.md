@@ -38,4 +38,3 @@ This was created for the ICSSC WebJam 2024 at UCI by Caden Lee, Hodaka Nakamura,
 Technologies and tools:
     - [Next.js](https://nextjs.org) (bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app))
     - Tailwind CSS
-test
