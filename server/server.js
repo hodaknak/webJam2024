@@ -26,8 +26,14 @@ const db = new sqlite3.Database(
   }
 );
 
+
+
 //Creating all of the tables inside of the db
 db.serialize(() => {
+    let gameTableMade = false;
+    let userTableMade = false;
+    let roomTableMade = false;
+    let questionsTableMade = false;
     db.run("DROP TABLE IF EXISTS Game");
     db.run(
         `CREATE TABLE IF NOT EXISTS Game (
@@ -41,6 +47,7 @@ db.serialize(() => {
             return console.error(err.message);
         }
         console.log("Created Game table.");
+        gameTableMade = true;
         }
     );
     db.run("DROP TABLE IF EXISTS Users");
@@ -56,6 +63,7 @@ db.serialize(() => {
           return console.error(err.message);
         }
         console.log("Created Users table.");
+        userTableMade = true;
       }
     );
     db.run("DROP TABLE IF EXISTS Rooms");
@@ -63,6 +71,7 @@ db.serialize(() => {
       `CREATE TABLE IF NOT EXISTS Rooms (
         RoomID TEXT,
         GameCode TEXT,
+        Question TEXT,
         PRIMARY KEY (RoomID, GameCode)
       )`,
       (err) => {
@@ -70,8 +79,48 @@ db.serialize(() => {
           return console.error(err.message);
         }
         console.log("Created Rooms table.");
+        roomTableMade = true;
       }
     );
+    db.run("DROP TABLE IF EXISTS Questions");
+    db.run(
+        `CREATE TABLE IF NOT EXISTS Questions (
+        id INTEGER PRIMARY KEY,
+        Question TEXT
+    )`,
+    (err) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log("Created Questions table.");
+        questionsTableMade = true;
+      }
+
+    )
+    //Filling questionList with questions. It has to be done like this or the programs tries to insert the information before the table is created
+    const checkTables = () => {
+        if (roomTableMade && userTableMade && roomTableMade && questionsTableMade) {
+            const fs = require('fs');
+            fs.readFile('questions.json', 'utf-8', (err, data) => {
+                if (err) {
+                    console.error("File cannot be read: ", err);
+                    return;
+                }
+                const questions = JSON.parse(data);
+                questions.forEach(({ id, question }) => {
+                    db.run('INSERT INTO Questions(id,Question) VALUES(?,?)',[id,question],(err) => {
+                        if (err) {
+                          return console.error(err.message);
+                        }
+                    })
+                });
+                console.log("Questions inserted");
+            clearInterval(interval)
+        })
+        };
+    }
+    
+    const interval = setInterval(checkTables, 100);
 });
 
 //let Server = require("socket.io");
@@ -82,6 +131,8 @@ db.serialize(() => {
         method: ["GET", "POST"]
     }
 });*/
+
+
 
 io.on("connection", (socket) => {
     console.log("Connection established");
@@ -144,6 +195,20 @@ io.on("connection", (socket) => {
         };
 
         io.emit("msg", res);
+    });
+
+    socket.on("fetchQuestion", (msg) => {
+        // TODO: Create a way to fetch questions and emit it
+
+        const fileContent = readFile("/icebreakers.txt", "utf-8");
+        var lines = fileContent.split("\n");
+        
+
+        let result = {
+            randNum: Math.floor(Math.random() * 99)+1,
+            question: lines[randNum]
+        };
+        socket.emit("fetchQuestion", result);
     });
 
     socket.on("username", (data) => {
