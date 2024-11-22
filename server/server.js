@@ -118,7 +118,7 @@ db.serialize(() => {
           clearInterval(interval)
           questionsInserted = true;
           //This is Kyle's dummy data for testing socket.on events
-          db.run("INSERT INTO Game(GameCode, Host, Messages, GameState) VALUES(?, ?, ?, ?)", ["ABCD","Jeff","","playing"], (err) => {
+          /*db.run("INSERT INTO Game(GameCode, Host, Messages, GameState) VALUES(?, ?, ?, ?)", ["ABCD","Jeff","","playing"], (err) => {
             if (err) {
               return console.error(err.message);
             }
@@ -183,7 +183,7 @@ db.serialize(() => {
               return console.error(err.message);
             }
             console.log("User inserted");
-          })
+          })*/
             const fs = require('fs');
             fs.readFile('questions.json', 'utf-8', (err, data) => {
                 if (err) {
