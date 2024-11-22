@@ -58,17 +58,18 @@ export default function Game() {
         // username was updated
         socket.on("connection", (msg) => {
             setUsername(msg);
-            socket.emit("join")
+            socket.emit("join", {code: getGameCode()})
         });
 
         socket.on("joined", (msg) => {
             console.log(msg);
-            console.log(getRoomName())
 
-            if (getRoomName() in msg) {
-                setParticipants(msg[getRoomName()]);
-            } else {
-                setParticipants([]);
+            if (getGameCode() === msg.code) {
+                if (getRoomName() in msg.rooms) {
+                    setParticipants(msg.rooms[getRoomName()]);
+                } else {
+                    setParticipants([]);
+                }
             }
         });
 

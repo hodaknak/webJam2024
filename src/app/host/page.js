@@ -10,9 +10,9 @@ const socket = io(URL);
 
 
 export default function Host() {
-    const [participants, setParticipants] = useState([])
-    const [rooms, setRooms] = useState([])
-    const [gameCode, setGameCode] = useState("")
+    const [participants, setParticipants] = useState([]);
+    const [rooms, setRooms] = useState([]);
+    const [gameCode, setGameCode] = useState("");
 
     let getGameCode = () => {
         if (gameCode.length == 0) {
@@ -21,6 +21,38 @@ export default function Host() {
             return gameCode;
         }
     }
+
+    useEffect(() => {
+        socket.on("joined", (msg) => {
+            if (getGameCode() === msg.code) {
+                let updatedRooms = msg.rooms;
+
+                for (let i = 0; i < rooms.length; i++) {
+                    let roomName = rooms[i].name;
+
+                    if (!(roomName in updatedRooms)) {
+                        updatedRooms[roomName] = [];
+                    }
+                }
+
+                console.log(updatedRooms);
+
+                let output = []
+
+                for (let roomName of Object.keys(updatedRooms)) {
+                    output.push({name: roomName, users: updatedRooms[roomName]});
+                }
+
+                output.sort((a, b) => (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0))
+
+                setRooms(output);
+            }
+        });
+
+        return () => {
+            socket.off("joined");
+        }
+    }, [gameCode, rooms]);
 
     useEffect(() => {
         socket.on("fetchGame", (msg) => {
@@ -38,28 +70,6 @@ export default function Host() {
             //console.log([...rooms, msg]);
 
             setRooms((prevRooms) => [...prevRooms, msg]);
-        });
-
-        socket.on("joined", (msg) => {
-            // TODO: update rooms so it updates the cards
-
-            let updatedRooms = msg;
-
-            for (let i = 0; i < rooms.length; i++) {
-                let roomName = rooms[i].name;
-
-                if (!(roomName in updatedRooms)) {
-                    updatedRooms[roomName] = [];
-                }
-            };
-
-            let output = []
-
-            for (let roomName of Object.keys(updatedRooms)) {
-                output.push({name: roomName, users: updatedRooms[roomName]});
-            }
-
-            setRooms(output);
         });
 
         socket.emit("createGame", {});
@@ -128,7 +138,7 @@ export default function Host() {
             <p className="text-xl mt-20">
                 Rooms:
             </p>
-            <div style={{"display": "flex", "flexWrap": "wrap"}}>
+            <div className="flex flex-wrap justify-center">
                 {getRooms().map((item, index) => (
                     <div className="roombox" key={index}>
                         <span style={{"fontWeight": "bold"}}>Room {item.name}</span>
