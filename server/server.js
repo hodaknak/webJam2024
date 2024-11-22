@@ -146,6 +146,20 @@ io.on("connection", (socket) => {
         io.emit("msg", res);
     });
 
+    socket.on("fetchQuestion", (msg) => {
+        // TODO: Create a way to fetch questions and emit it
+
+        const fileContent = readFile("/icebreakers.txt", "utf-8");
+        var lines = fileContent.split("\n");
+        
+
+        let result = {
+            randNum = Math.floor(Math.random() * 99)+1;
+            question: lines[randNum]
+        };
+        socket.emit("fetchQuestion", result);
+    });
+
     socket.on("username", (data) => {
         // TODO: verify username, set username in database
         // TODO: if username is the same as someone else, add a "2" (/other number) after it
