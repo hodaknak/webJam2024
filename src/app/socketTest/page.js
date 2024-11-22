@@ -25,7 +25,7 @@ export default function SocketTest() {
             username: "John"
             
         }
-        socket.emit("username",data);
+        socket.emit("fetchRoom",data);
     }
 
     return (
