@@ -59,7 +59,7 @@ export default function Game() {
         // destructor
         return () => {
             socket.off("fetchRoom");
-            socket.off("msg")
+            socket.off("msg");
         };
     }, []);
 
