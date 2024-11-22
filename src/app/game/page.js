@@ -139,7 +139,7 @@ export default function Game() {
     return (
         <>
             <style>{'html, body { height: 100%; margin: 0; }'}</style>
-            <div className="w-full text-center flex flex-col justify-between" style={{height: 'calc(100% - 5rem)'}}>
+            <div className="w-full text-center flex flex-col justify-between items-center" style={{height: 'calc(100% - 5rem)'}}>
                 <div className="roundbox">
                     <div>Game code: <span className="codespan">{getGameCode()}</span></div>
                     <div>Room name: <span className="codespan">{getRoomName()}</span></div>
@@ -151,51 +151,45 @@ export default function Game() {
                         </ul>
                     </div>
                 </div>
-                <div style={{"display": "flex", "justifyContent": "center"}}>
-                    <div style={{"maxWidth": "1000px", "minWidth": "500px"}}>
-                        <div hidden={finishedUsername}>
-                            What should everyone call you?
+                <div className="flex justify-center flex-grow w-full">
+                    <div style={{display: finishedUsername ? "none" : "flex"}} className="mt-10 flex-col items-center">
+                        What should everyone call you?
+                        <br/>
+                        <input
+                            className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5 m-5"
+                            style={{"width": "100%"}}
+                            type="text"
+                            value={username}
+                            placeholder="Enter a username"
+                            onChange={(e) => setUsername(e.target.value)}
+                            onKeyDown={usernameKeyDown}
+                            autoFocus={true}
+                        />
+                        <button onClick={submitUsername}>Join</button>
+                    </div>
+                    <div style={{display: finishedUsername ? "flex" : "none"}} className="w-full flex flex-col items-center">
+                        {/* TODO: Provide some instructions */}
+                        <p className="text-xl mt-16">
+                            Your question is:
+                            <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
+                        </p>
+                        <br/>
+                        <div className="overflow-y-auto flex-grow h-80 w-3/6 border-t-4 border-t-sky-400 mb-4">
                             <br/>
+                            {[...messages].reverse().map((msg, index) => (
+                                <div key={index} className={msg.name == username ? "yourmessage" : ""}>{msg.datetime} {msg.name}: {msg.message}</div>
+                            ))}
+                        </div>
+                        <div className="roundbox min-w-96">
                             <input
                                 className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-                                style={{"width": "50%"}}
                                 type="text"
-                                value={username}
-                                placeholder="Enter a username"
-                                onChange={(e) => setUsername(e.target.value)}
-                                onKeyDown={usernameKeyDown}
-                                autoFocus={true}
+                                value={fieldText}
+                                placeholder="What are your thoughts?"
+                                onChange={(e) => setFieldText(e.target.value)}
+                                onKeyDown={keyDown}
                             />
-                            <br/>
-                            <button onClick={submitUsername}>Join</button>
-                            <div style={{"height": "50%"}}>
-                            </div>
-                            <br/>
-                        </div>
-                        <div hidden={!finishedUsername}>
-                            {/* TODO: Provide some instructions */}
-                            <p className="text-xl mt-16">
-                                Your question is:
-                                <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
-                            </p>
-                            <br/>
-                            <div className="flex flex-col justify-end flex-grow border-t-4 border-t-sky-400 mb-4">
-                                <br/>
-                                {messages.map((msg, index) => (
-                                    <div key={index} className={msg.name == username ? "yourmessage" : ""}>{msg.datetime} {msg.name}: {msg.message}</div>
-                                ))}
-                            </div>
-                            <div className="roundbox">
-                                <input
-                                    className="messagebox border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 p-2.5"
-                                    type="text"
-                                    value={fieldText}
-                                    placeholder="What are your thoughts?"
-                                    onChange={(e) => setFieldText(e.target.value)}
-                                    onKeyDown={keyDown}
-                                />
-                                <button onClick={sendMessage}>send</button>
-                            </div>
+                            <button onClick={sendMessage}>send</button>
                         </div>
                     </div>
                 </div>
