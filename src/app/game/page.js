@@ -10,7 +10,7 @@ const socket = io(URL);
 
 const timezoneOffset = new Date().getTimezoneOffset() * 60000;
 
-const fetchRoom = (roomName, code) => {
+const fetchRoom = (code) => {
     let data = {
         code: code
     }
@@ -73,7 +73,13 @@ export default function Game() {
             }
         });
 
-        fetchRoom(getRoomName(), getGameCode());
+        socket.on("updateSelf", (msg) => {
+            console.log("updating");
+
+            fetchRoom(getGameCode());
+        });
+
+        fetchRoom(getGameCode());
 
         // destructor
         return () => {
@@ -81,6 +87,7 @@ export default function Game() {
             socket.off("msg");
             socket.off("connection");
             socket.off("joined");
+            socket.off("updateSelf");
         };
     }, [roomName]);
 
