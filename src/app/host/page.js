@@ -99,19 +99,19 @@ export default function Host() {
     const hostAddRoom = () => {
         // TODO: connect to socket and attempt
         // TODO: update/fetch afterwards
-
         socket.emit("createRoom", {code: gameCode});
-
     }
 
     const hostRemoveRoom = () => {
         // TODO: connect to socket and attempt
         // TODO: update/fetch afterwards
+        //socket.emit("removeRoom", {code: gameCode});
     }
 
     const hostShuffleParticipants = () => {
         // TODO: connect to socket and attempt
         // TODO: update/fetch afterwards
+        socket.emit("mixRooms", {code: gameCode});
     }
 
     return (
