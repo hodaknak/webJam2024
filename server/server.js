@@ -595,32 +595,41 @@ io.on("connection", (socket) => {
                 roomName = String.fromCharCode(roomid.charCodeAt(0) + 1);
             }
 
-            data = [roomName, gameCode];
-
-            db.run(insertRoomQuery, data,(err) => {
+            //random number between 1 and 100 inclusive is generated for the 100 questions we have
+            let id = Math.floor(Math.random() * 100) + 1;
+            db.all(selectQuestionQuery, [id], (err, rows) => {
                 if (err) {
                     return console.error(err.message);
                 }
-                console.log("Room Inserted");
+                let question = rows[0].Question;
 
-                fs.readFile("messages.json", "utf-8", (err, data) => {
+                data = [roomName, gameCode, question];
+
+                db.run(insertRoomQuery, data,(err) => {
                     if (err) {
-                        console.error(err.message);
-                    } else {
-                        let obj = JSON.parse(data);
-
-                        if (gameCode in obj) {
-                            obj[gameCode][roomName] = []
-
-                            fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
-                                if (err) {
-                                    console.error(err.message);
-                                } else {
-                                    socket.emit("createRoom", {name: roomName, users: []});
-                                }
-                            })
-                        }
+                        return console.error(err.message);
                     }
+                    console.log("Room Inserted");
+
+                    fs.readFile("messages.json", "utf-8", (err, data) => {
+                        if (err) {
+                            console.error(err.message);
+                        } else {
+                            let obj = JSON.parse(data);
+
+                            if (gameCode in obj) {
+                                obj[gameCode][roomName] = []
+
+                                fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                                    if (err) {
+                                        console.error(err.message);
+                                    } else {
+                                        socket.emit("createRoom", {name: roomName, users: []});
+                                    }
+                                })
+                            }
+                        }
+                    });
                 });
             });
         });
@@ -734,24 +743,24 @@ io.on("connection", (socket) => {
 
     //fetches a question from the questions taable
     socket.on("fetchQuestion", (msg) => {
-      let res = null;
-      //random number between 1 and 100 inclusive is generated for the 100 questions we have
-      let id = Math.floor(Math.random() * 100) + 1;
-      db.all(selectQuestionQuery,[id],(err,rows) => {
-        if (err) {
-          return console.error(err.message);
-        }
-        res = rows[0].Question;
-        if(res != null) {
-          console.log(`Question fetched: ${res}`);
-          socket.emit("fetchQuestion", res);
-        }
-      });
+        let res = null;
+        //random number between 1 and 100 inclusive is generated for the 100 questions we have
+        let id = Math.floor(Math.random() * 100) + 1;
+        db.all(selectQuestionQuery, [id], (err, rows) => {
+            if (err) {
+                return console.error(err.message);
+            }
+            res = rows[0].Question;
+            if (res != null) {
+                console.log(`Question fetched: ${res}`);
+                socket.emit("fetchQuestion", res);
+            }
+        });
+    });
       
     socket.on("disconnect", () => {
       console.log("disconnected");
     });
-  });
 });
 
 server.listen(3001, () => {
