@@ -686,7 +686,7 @@ io.on("connection", (socket) => {
 
         // select a random room
 
-        let query = "SELECT RoomID FROM Rooms WHERE GameCode = ? ORDER BY RANDOM() LIMIT 1;"
+        let query = "SELECT * FROM Rooms WHERE GameCode = ? ORDER BY RANDOM() LIMIT 1;"
 
         db.all(query, [roomCode], (err, rows) => {
             if (err) {
@@ -694,6 +694,7 @@ io.on("connection", (socket) => {
             }
 
             let name = rows[0].RoomID;
+            let question = rows[0].Question
 
             // get all participants
 
@@ -717,7 +718,8 @@ io.on("connection", (socket) => {
                         let res = {
                             messages: messages,
                             participants: userList,
-                            roomName: name
+                            roomName: name,
+                            question: question
                         }
 
                         socket.emit("fetchRoom", res);
