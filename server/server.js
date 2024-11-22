@@ -766,7 +766,7 @@ io.on("connection", (socket) => {
         let RoomID = null;
         let userList = [];
         let roomList = [];
-        db.all("SELECT * FROM Game where Host = ?", [socket_id],(err,rows) => {
+        db.all("SELECT * FROM Game where Host = ?", [socket.id],(err,rows) => {
             if(err) {
                 return console.error(err.message);
             }
@@ -791,7 +791,7 @@ io.on("connection", (socket) => {
                                 return console.error(err.message);
                             }
                             console.log("row deleted");
-                            db.all(selectAllUsersInGame, [msg.code], (err, rows) => {
+                            db.all(selectAllUsersInGame, [GameCode], (err, rows) => {
                                 if (err) {
                                     return console.error(err.message);
                                 }
@@ -799,7 +799,7 @@ io.on("connection", (socket) => {
                                     userList.push(element.id);
                                 });
                                 //this finds all of the rows in the game and creates an array with all of their RoomIDs
-                                db.all(selectAllRoomsInGame, [msg.code], (err, rows) => {
+                                db.all(selectAllRoomsInGame, [GameCode], (err, rows) => {
                                     if (err) {
                                         return console.error(err.message);
                                     }
@@ -818,6 +818,16 @@ io.on("connection", (socket) => {
                                         })
                                         roomIndex++;
                                     })
+
+                                    db.all(selectAllUsersInGame, [GameCode], (err, rows) => {
+                                        if (err) {
+                                            return console.error(err.message);
+                                        }
+
+                                        rows.forEach(element => {
+                                            io.to(element.id).emit("updateSelf", {});
+                                        });
+                                    });
                                 });
                             });
                         });
