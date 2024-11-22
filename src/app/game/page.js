@@ -140,7 +140,7 @@ export default function Game() {
         <>
             <style>{'html, body { height: 100%; margin: 0; }'}</style>
             <div className="w-full text-center flex flex-col justify-between items-center" style={{height: 'calc(100% - 5rem)'}}>
-                <div className="roundbox">
+                <div className="roundbox mt-5">
                     <div>Game code: <span className="codespan">{getGameCode()}</span></div>
                     <div>Room name: <span className="codespan">{getRoomName()}</span></div>
                     <div>
@@ -174,10 +174,10 @@ export default function Game() {
                             <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
                         </p>
                         <br/>
-                        <div className="overflow-y-auto flex-grow h-80 w-3/6 border-t-4 border-t-sky-400 mb-4">
+                        <div className="flex flex-col-reverse overflow-y-auto flex-grow h-80 w-3/6 border-t-4 border-t-sky-400 mb-4">
                             <br/>
                             {[...messages].reverse().map((msg, index) => (
-                                <div key={index} className={msg.name == username ? "yourmessage" : ""}>{msg.datetime} {msg.name}: {msg.message}</div>
+                                <div key={index} className={msg.name === username ? "yourmessage" : ""}>{msg.datetime} {msg.name}: {msg.message}</div>
                             ))}
                         </div>
                         <div className="roundbox min-w-96">
