@@ -205,7 +205,7 @@ io.on("connection", (socket) => {
         
 
         let result = {
-            randNum = Math.floor(Math.random() * 99)+1;
+            randNum: Math.floor(Math.random() * 99)+1,
             question: lines[randNum]
         };
         socket.emit("fetchQuestion", result);
