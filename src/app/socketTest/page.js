@@ -18,11 +18,13 @@ export default function SocketTest() {
 
     const fetchMessages = () => {
         let data = {
+            host_id: "123489",
             code: "ABCD",
-            name: "1234"
+            name: "1234",
+            id: "1"
             
         }
-        socket.emit("fetchGame",data);
+        socket.emit("createGame",data);
     }
 
     return (
