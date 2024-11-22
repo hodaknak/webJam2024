@@ -98,7 +98,8 @@ export default function Game() {
             name: username, // the server doesn't actually need this, just put whatever is stored locally
             message: fieldText,
             datetime: `${hourminute.getHours()}:${hourminute.getMinutes()}`,
-            room: roomName
+            room: roomName,
+            code: getGameCode()
         };
 
         socket.emit("msg", data);
@@ -116,7 +117,9 @@ export default function Game() {
         setFinishedUsername(true);
         // TODO: submit the username
         let data = {
-            username: username
+            username: username,
+            code: getGameCode(),
+            room: roomName
         };
         socket.emit("username", data);
         // TODO: update the current username based on the result

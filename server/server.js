@@ -204,6 +204,8 @@ io.on("connection", (socket) => {
         let user = socket.id;
         let message = msg.message;
         let datetime = msg.datetime;
+        let roomCode = msg.code;
+        let roomName = msg.room;
 
         console.log(`${user}: ${message} ${datetime}`);
 
@@ -226,7 +228,7 @@ io.on("connection", (socket) => {
                 } else {
                     let obj = JSON.parse(data);
 
-                    obj[msg.code][msg.room].push(res);
+                    obj[roomCode][roomName].push(res);
 
                     fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
                         if (err) {
@@ -234,7 +236,17 @@ io.on("connection", (socket) => {
                         } else {
                             // TODO: only send to people in room
 
-                            io.emit("msg", res);
+                            db.all(selectAllUsersInRoom, [roomCode, roomName], (err, rows) => {
+                                if (err) {
+                                    return console.error(err.message);
+                                }
+                                rows.forEach(element => {
+                                    let socketid = element.id;
+                                    console.log(socketid)
+
+                                    io.to(socketid).emit("msg", res);
+                                });
+                            });
                         }
                     })
                 }
@@ -271,7 +283,7 @@ io.on("connection", (socket) => {
             }
           }
           let username = msg.username+duplicate.toString();
-          db.run(insertUserQuery,[socket.id,username,"",""],(err) => {
+          db.run(insertUserQuery,[socket.id, username, msg.code, msg.room],(err) => {
             if(err) {
               return console.error(err.message);
             }
@@ -444,17 +456,48 @@ io.on("connection", (socket) => {
         // TODO: handle non existent room code
 
         let roomCode = msg.code;
+        let userList = [];
 
         // select a random room
 
         let query = "SELECT RoomID FROM Rooms WHERE GameCode = ? ORDER BY RANDOM() LIMIT 1;"
 
-        db.all(selectRoomQuery, [roomCode], (err, rows) => {
+        db.all(query, [roomCode], (err, rows) => {
             if (err) {
                 return console.error(err.message);
             }
 
-            let id = rows[0].RoomID;
+            let name = rows[0].RoomID;
+
+            // get all participants
+
+            db.all(selectAllUsersInRoom, [roomCode, name], (err, rows) => {
+                if (err) {
+                    return console.error(err.message);
+                }
+                rows.forEach(element => {
+                    userList.push(element.id);
+                });
+
+
+                fs.readFile("messages.json", "utf-8", (err, data) => {
+                    if (err) {
+                        console.error(err.message);
+                    } else {
+                        let obj = JSON.parse(data);
+
+                        let messages = obj[roomCode][name];
+
+                        let res = {
+                            messages: messages,
+                            participants: userList,
+                            roomName: name
+                        }
+
+                        socket.emit("fetchRoom", res);
+                    }
+                });
+            });
         });
     });
 
