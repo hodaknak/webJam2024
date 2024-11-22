@@ -537,7 +537,7 @@ io.on("connection", (socket) => {
                 }
             }
             // inserts the newly created game into the Game table
-            db.run(insertGameQuery,[newGameCode,msg.host_id,"","waiting"],(err) => {
+            db.run(insertGameQuery,[newGameCode,msg.socket.id,"","waiting"],(err) => {
                 if (err) {
                   return console.error(err.message);
                 }
