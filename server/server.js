@@ -142,37 +142,37 @@ db.serialize(() => {
             }
             console.log("Room inserted");
           })
-          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["2","John5","ABCD",""], (err) => {
+          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["2","John5","ABCD","1000"], (err) => {
             if (err) {
               return console.error(err.message);
             }
             console.log("User inserted");
           })
-          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["3","John2","ABCD",""], (err) => {
+          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["3","John2","ABCD","1001"], (err) => {
             if (err) {
               return console.error(err.message);
             }
             console.log("User inserted");
           })
-          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["4","John3","ABCD",""], (err) => {
+          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["4","John3","ABCD","1000"], (err) => {
             if (err) {
               return console.error(err.message);
             }
             console.log("User inserted");
           })
-          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["5","John5","ABCD",""], (err) => {
+          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["5","John5","ABCD","1002"], (err) => {
             if (err) {
               return console.error(err.message);
             }
             console.log("User inserted");
           })
-          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["6","John2","ABCD",""], (err) => {
+          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["6","John2","ABCD","1001"], (err) => {
             if (err) {
               return console.error(err.message);
             }
             console.log("User inserted");
           })
-          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["7","John3","ABCD",""], (err) => {
+          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["7","John3","ABCD","1000"], (err) => {
             if (err) {
               return console.error(err.message);
             }
@@ -679,47 +679,52 @@ io.on("connection", (socket) => {
         // msg object can be empty
         // TODO: fetch the room name, the participants in the room, and the messages in the room from db (based on the user's socket ID)
         let res = null;
-        let roomID = null;
+        let GameCode = null;
+        let RoomID = null;
         let userList = [];
         let data = null;
         let roomQuestion = null;
         // TODO: fetch all the info ONLY based on the socket ID, not anything else
         console.log(`${socket.id}: fetching room`);// of gamecode ${msg.code} and roomid ${msg.name}`);
-        /*try {
+        try {
             db.serialize(() => {
-                //this query finds the room and sets roomID and roomQuestion to whatever value the database has for it
-                db.all(selectRoomQuery,[msg.name,msg.code],(err,rows) => {
-                    if (err) {
-                        return console.error("Error selecting room:" + err.message);
-                    }
-                    if (rows == undefined || rows.length == 0) {
-                        throw ('Result undefined');
-                    }
-                    res = rows[0];
-                    roomQuestion = res.Question;
-                    roomID = res.RoomID;})
-
-                //finds all of the users in the room and creates an array with their ids
-                db.all(selectAllUsersInRoom,[msg.code,msg.name],(err,rows) => {
+                db.all(selectUserQuery,[msg.id],(err,rows) => {
+                  if(err) {
+                    return console.error("Error selecting room: " + err.message);
+                  }
+                  GameCode = rows[0].GameCode;
+                  RoomID = rows[0].BreakoutRoomCode;
+                  //this query finds the room and sets roomID and roomQuestion to whatever value the database has for it
+                db.all(selectRoomQuery,[RoomID,GameCode],(err,rows) => {
+                  if (err) {
+                      return console.error("Error selecting room:" + err.message);
+                  }
+                  if (rows == undefined || rows.length == 0) {
+                      throw ('Result undefined');
+                  }
+                  roomQuestion = rows[0].Question;
+                  db.all(selectAllUsersInRoom,[GameCode,RoomID],(err,rows) => {
                     if(err) {
-                        return console.error(err.message);
+                      return console.error("Error selecting room:" + err.message);
                     }
                     rows.forEach(element => {
-                        userList.push(element.id);
+                      userList.push(element.id);
                     });
-                    //building the data to send back
                     data = {
-                        roomName: roomID,
-                        participants: userList,
-                        question: roomQuestion
+                      roomName: RoomID,
+                      participants: userList,
+                      question: roomQuestion
                     }
                     console.log(data);
                     socket.emit("fetchRoom", data);
-                })         
+                    })
+              })         
+            })
+              
             });
         } catch (e) {
             console.error("Exception in fetchRoom: " + e);
-        }*/
+        }
         // TODO: get the above working with only the socket ID
         // TODO: Should return MESSAGES, PARTICIPANTS, QUESTION, and ROOM NAME
         // TODO: Like the format below
