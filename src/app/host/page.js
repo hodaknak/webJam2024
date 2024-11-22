@@ -8,13 +8,6 @@ const URL = "http://localhost:3001";
 
 const socket = io(URL);
 
-const fetchGame = () => {
-    let data = {
-        code: "1234"
-    }
-
-    socket.emit("fetchGame", data);
-}
 
 export default function Host() {
     const [participants, setParticipants] = useState([])
@@ -39,10 +32,11 @@ export default function Host() {
 
         socket.on("createGame", (msg) => {
             setGameCode(msg.code);
-            socket.emit("fetchGame", {});
+            socket.emit("fetchGame", {code: msg.code});
         });
 
         socket.emit("createGame", {});
+        console.log("effect")
 
         return () => {
             socket.off("createGame"); // Needed to clean up

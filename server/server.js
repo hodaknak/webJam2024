@@ -26,7 +26,13 @@ const db = new sqlite3.Database(
   }
 );
 
+const fs = require('fs');
 
+fs.writeFile("./messages.json", JSON.stringify({}), "utf8", (err) => {
+    if (err) {
+        throw err;
+    }
+});
 
 //Creating all of the tables inside of the db
 db.serialize(() => {
@@ -100,27 +106,13 @@ db.serialize(() => {
     //Filling questionList with questions. It has to be done like this or the programs tries to insert the information before the table is created
     const checkTables = () => {
         if (roomTableMade && userTableMade && roomTableMade && questionsTableMade) {
-          db.run("INSERT INTO Rooms(RoomID,GameCode,Question) VALUES(?, ?, ?)", ["1234", "ABCD", "d"], (err) => {
+          /*db.run("INSERT INTO Rooms(RoomID,GameCode,Question) VALUES(?, ?, ?)", ["1234", "ABCD", "d"], (err) => {
               console.log("im here");
               if (err) {
                 return console.error(err.message);
               }
               console.log("1 stuff got inserted");
-            })
-          db.run("INSERT INTO Users(id,Username,GameCode,BreakoutRoomCode) VALUES(?, ?, ?,?)", ["1","John", "1234", "ABCD"], (err) => {
-            console.log("im here");
-            if (err) {
-              return console.error(err.message);
-            }
-            console.log("2 stuff got inserted");
-          })
-          db.run("INSERT INTO Users(id,Username,GameCode,BreakoutRoomCode) VALUES(?, ?, ?,?)", ["2","Jen", "1234", "ABCD"], (err) => {
-            console.log("im here");
-            if (err) {
-              return console.error(err.message);
-            }
-            console.log("3 stuff got inserted");
-          })
+            })*/
             const fs = require('fs');
             fs.readFile('questions.json', 'utf-8', (err, data) => {
                 if (err) {
@@ -152,8 +144,6 @@ db.serialize(() => {
         method: ["GET", "POST"]
     }
 });*/
-
-
 
 io.on("connection", (socket) => {
     console.log("Connection established");
@@ -262,20 +252,52 @@ io.on("connection", (socket) => {
         let newGameCode = "";
         let res = null;
         let valid = false;
-        while(valid == false) {
-          for (let i = 0; i < 4; i++) {
-            newGameCode += String.fromCharCode(('a'.charCodeAt(0) + Math.floor(Math.random() * 26)))
+        console.log("Trying to make room");
+        db.serialize(() => {
+          //ill figure out the unique thing later
+          while(valid == false) {
+            newGameCode = "";
+            for (let i = 0; i < 4; i++) {
+              newGameCode += String.fromCharCode(('a'.charCodeAt(0) + Math.floor(Math.random() * 26)))
+            }
+            console.log(`New Room Code: ${newGameCode}`);
+            db.all(selectGameQuery,[newGameCode],(err,rows) => {
+              if (err) {
+                return console.error(err.message);
+              }
+              console.log(rows);
+              console.log(rows.length);
+              if(rows.length == 0) {
+                valid = true;
+                console.log("i made here");
+              }
+            });
+            valid = true;
           }
-          db.all(selectGameQuery,newGameCode,(err,rows) => {
+          console.log(`${socket.id}: creating game of code ${newGameCode}`);
+          db.run(insertGameQuery,[newGameCode,socket.id,"","waiting"],(err) => {
             if (err) {
               return console.error(err.message);
             }
-            res = rows[0];
+            console.log("Game Created");
           });
-        }
-        
-        console.log(`${socket.id}: creating game of code ${newGameCode}`);
-        socket.emit("fetchGame", res);
+        });
+        fs.readFile("messages.json", "utf-8", (err, data) => {
+            if (err) {
+                console.error(err.message);
+            } else {
+                let obj = JSON.parse(data);
+
+                obj[newGameCode] = {}
+
+                fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                    if (err) {
+                        console.error(err.message);
+                    }
+                })
+            }
+        })
+
         // TODO: error handling
         socket.emit("createGame", res);
     });

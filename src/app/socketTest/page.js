@@ -22,7 +22,7 @@ export default function SocketTest() {
             name: "1234"
             
         }
-        socket.emit("fetchRoom", data);
+        socket.emit("createGame");
     }
 
     return (
