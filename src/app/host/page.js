@@ -63,6 +63,21 @@ export default function Host() {
         return res;
     }
 
+    const hostAddRoom = () => {
+        // TODO: connect to socket and attempt
+        // TODO: update/fetch afterwards
+    }
+
+    const hostRemoveRoom = () => {
+        // TODO: connect to socket and attempt
+        // TODO: update/fetch afterwards
+    }
+
+    const hostShuffleParticipants = () => {
+        // TODO: connect to socket and attempt
+        // TODO: update/fetch afterwards
+    }
+
     return (
         <div className="w-full text-center">
             <div className="roundbox">
@@ -80,10 +95,10 @@ export default function Host() {
                 <br/>Don't reload this page.
             </p>
             <br/>
-            <button>+ Add a room</button>
-            <button>- Remove a room</button>
+            <button onClick={hostAddRoom}>+ Add a room</button>
+            <button onClick={hostRemoveRoom}>- Remove a room</button>
             <br/>
-            <button>Shuffle/distribute participants</button>
+            <button onClick={hostShuffleParticipants}>Shuffle/distribute participants</button>
             <p className="text-xl mt-20">
                 Rooms:
             </p>
