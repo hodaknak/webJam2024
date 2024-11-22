@@ -315,25 +315,27 @@ io.on("connection", (socket) => {
         })
     });
     socket.on("join", (msg) => {
+        let gameCode = msg.code;
+
         let query = "SELECT * FROM Users";
 
-        db.all(query, (err, rows) => {
+        db.all(selectAllUsersInGame, [gameCode], (err, rows) => {
             let res = {};
 
             for (let row of rows) {
-                let code = row.BreakoutRoomCode;
+                let name = row.BreakoutRoomCode;
                 let username = row.Username;
 
-                if (code in res) {
-                    res[code].push(username);
+                if (name in res) {
+                    res[name].push(username);
                 } else {
-                    res[code] = [username];
+                    res[name] = [username];
                 }
             }
 
             console.log(res);
 
-            io.emit("joined", res);
+            io.emit("joined", {code: gameCode, rooms: res});
         });
     });
 
