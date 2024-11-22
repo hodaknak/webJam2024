@@ -314,6 +314,7 @@ io.on("connection", (socket) => {
             });
         })
     });
+
     socket.on("join", (msg) => {
         let gameCode = msg.code;
 
@@ -766,7 +767,7 @@ io.on("connection", (socket) => {
         let RoomID = null;
         let userList = [];
         let roomList = [];
-        db.all("SELECT * FROM Game where Host = ?", [socket_id],(err,rows) => {
+        db.all("SELECT * FROM Game where Host = ?", [socket.id],(err,rows) => {
             if(err) {
                 return console.error(err.message);
             }
@@ -822,6 +823,7 @@ io.on("connection", (socket) => {
                             });
                         });
                     });
+                    socket.emit("removeRoom", {code: GameCode});
                 };
             });
         });

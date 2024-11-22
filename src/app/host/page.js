@@ -24,6 +24,7 @@ export default function Host() {
 
     useEffect(() => {
         socket.on("joined", (msg) => {
+            console.log("Received join: " + JSON.stringify(msg))
             if (getGameCode() === msg.code) {
                 let updatedRooms = msg.rooms;
 
@@ -72,6 +73,10 @@ export default function Host() {
             setRooms((prevRooms) => [...prevRooms, msg]);
         });
 
+        socket.on("removeRoom", (msg) => {
+            socket.emit("join", {code: msg.code})
+        });
+
         socket.emit("createGame", {});
         console.log("effect")
 
@@ -99,14 +104,13 @@ export default function Host() {
     const hostAddRoom = () => {
         // TODO: connect to socket and attempt
         // TODO: update/fetch afterwards
-
         socket.emit("createRoom", {code: gameCode});
-
     }
 
     const hostRemoveRoom = () => {
         // TODO: connect to socket and attempt
         // TODO: update/fetch afterwards
+        socket.emit("removeRoom", {code: gameCode});
     }
 
     const hostShuffleParticipants = () => {
