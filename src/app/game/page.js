@@ -27,6 +27,7 @@ export default function Game() {
     const [finishedUsername, setFinishedUsername] = useState(false);
     const [participants, setParticipants] = useState([]);
     const [roomName, setRoomName] = useState('');
+    const [question, setQuestion] = useState("");
 
     const pathname = usePathname()
     const params = useSearchParams()
@@ -44,6 +45,7 @@ export default function Game() {
             setMessages(msg.messages);
             setParticipants(msg.participants);
             setRoomName(msg.roomName);
+            setQuestion(msg.question);
         });
 
         socket.on("msg", (msg) => {
@@ -192,7 +194,7 @@ export default function Game() {
                         {/* TODO: Provide some instructions */}
                         <p className="text-xl mt-16">
                             Your question is:
-                            <br/><span style={{"fontWeight": "bold"}}>Is a hot dog a sandwich?</span>
+                            <br/><span style={{"fontWeight": "bold"}}>{question}</span>
                         </p>
                         <br/>
                         <div className="flex flex-col-reverse overflow-y-auto flex-grow h-80 w-3/6 border-t-4 border-t-sky-400 mb-4">

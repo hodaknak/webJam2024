@@ -113,7 +113,6 @@ db.serialize(() => {
 
     )
     //Filling questionList with questions. It has to be done like this or the programs tries to insert the information before the table is created
-
     const checkTables = () => {
         if (gameTableMade && userTableMade && roomTableMade && questionsTableMade && !questionsInserted) {
           clearInterval(interval)
@@ -261,82 +260,29 @@ io.on("connection", (socket) => {
     const selectAllUsersInGame = "SELECT * FROM Users where GameCode = ?"
     const selectAllRoomsInGame = "SELECT * FROM Rooms where GameCode = ?"
 
+
+    // Still a WIP
     socket.on("msg", (msg) => {
         let user = socket.id;
         let message = msg.message;
         let datetime = msg.datetime;
-        let roomCode = msg.code;
-        let roomName = msg.room;
 
         console.log(`${user}: ${message} ${datetime}`);
 
-        db.all(selectUserQuery, [user], (err, rows) => {
-            if (err) {
-                return console.error(err.message);
-            }
+        // TODO: add message to database
+        // TODO: fetch name from database
+        // TODO: get all socket ids in the room, use io.sockets.socket(socketid).emit() to send to all clients in room
 
-            let name = rows[0].Username;
+        let res = {
+            name: `whoever ${user} is`,
+            message: message,
+            datetime: datetime
+        };
 
-            let res = {
-                name: name,
-                message: message,
-                datetime: datetime
-            };
-
-            fs.readFile("messages.json", "utf-8", (err, data) => {
-                if (err) {
-                    console.error(err.message);
-                } else {
-                    let obj = JSON.parse(data);
-
-                    obj[roomCode][roomName].push(res);
-
-                    fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
-                        if (err) {
-                            console.error(err.message);
-                        } else {
-                            // TODO: only send to people in room
-
-                            db.all(selectAllUsersInRoom, [roomCode, roomName], (err, rows) => {
-                                if (err) {
-                                    return console.error(err.message);
-                                }
-                                rows.forEach(element => {
-                                    let socketid = element.id;
-                                    console.log(socketid)
-
-                                    io.to(socketid).emit("msg", res);
-                                });
-                            });
-                        }
-                    })
-                }
-            });
-        })
-    });
-    socket.on("join", (msg) => {
-        let query = "SELECT * FROM Users";
-
-        db.all(query, (err, rows) => {
-            let res = {};
-
-            for (let row of rows) {
-                let code = row.BreakoutRoomCode;
-                let username = row.Username;
-
-                if (code in res) {
-                    res[code].push(username);
-                } else {
-                    res[code] = [username];
-                }
-            }
-
-            console.log(res);
-
-            io.emit("joined", res);
-        });
+        io.emit("msg", res);
     });
 
+    // Checks if username is valid, if not, it adds a number to the end (e.g. Kyle2) and adds user into database
     socket.on("username", (msg) => {
         let users = [];
         let duplicate = 1;
@@ -369,14 +315,14 @@ io.on("connection", (socket) => {
           }
 
           //this query inserts the new user into the User Table
+          db.run(insertUserQuery,[socket.id,username,"",""],(err) => {
+            if(err) {
+              return console.error(err.message);
+            }
+            console.log(`${socket.id} set their username to ${username}`);
+            socket.emit("connection",username);
+          })
 
-            db.run(insertUserQuery,[socket.id, username, msg.code, msg.room],(err) => {
-                if(err) {
-                    return console.error(err.message);
-                }
-                console.log(`${socket.id} set their username to ${username}`);
-                socket.emit("connection",username);
-            })
         });
     });
 
@@ -567,6 +513,66 @@ io.on("connection", (socket) => {
 
     socket.on("createRoom", (msg) => {
         // create a room
+        let gameCode = msg.code;
+
+        let roomName = '';
+
+        // gets the latest room added (sorted in alphabetical order), so we can make a new room with the next alphabet
+        db.serialize(() => {
+            let query = "SELECT RoomID FROM rooms WHERE GameCode = ? ORDER BY RoomID DESC LIMIT 1"
+
+            let data;
+
+            db.all(query, [gameCode], (err, rows) => {
+                if (err) {
+                    return console.error(err.message);
+                }
+
+                console.log("Query result: ", rows);
+
+                if (rows.length === 0) {
+                    roomName = 'A';
+                } else {
+                    let roomid = rows[0].RoomID;
+
+                    roomName = String.fromCharCode(roomid.charCodeAt(0) + 1);
+                }
+
+                data = [roomName, gameCode];
+
+                db.run(insertRoomQuery, data,(err) => {
+                    if (err) {
+                        return console.error(err.message);
+                    }
+                    console.log("Room Inserted");
+                });
+            });
+        });
+
+        fs.readFile("messages.json", "utf-8", (err, data) => {
+            if (err) {
+                console.error(err.message);
+            } else {
+                let obj = JSON.parse(data);
+
+                if (gameCode in obj) {
+                    obj[gameCode][roomName] = []
+
+                    fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                        if (err) {
+                            console.error(err.message);
+                        }
+                    })
+                }
+            }
+        });
+
+        socket.emit("createRoom", {roomName: roomName, users: [/* TODO: how to get? */]});
+
+    });
+
+    socket.on("createRoom", (msg) => {
+        // create a room
         // create a room
         let gameCode = msg.code;
 
@@ -670,50 +676,54 @@ io.on("connection", (socket) => {
 
     //fetches the room and returns roomName, participants, and the question
     socket.on("fetchRoom", (msg) => {
-        let roomCode = msg.code;
+        // msg object can be empty
+        // TODO: fetch the room name, the participants in the room, and the messages in the room from db (based on the user's socket ID)
+        let res = null;
+        let roomID = null;
         let userList = [];
-
-        // select a random room
-
-        let query = "SELECT RoomID FROM Rooms WHERE GameCode = ? ORDER BY RANDOM() LIMIT 1;"
-
-        db.all(query, [roomCode], (err, rows) => {
-            if (err) {
-                return console.error(err.message);
-            }
-
-            let name = rows[0].RoomID;
-
-            // get all participants
-
-            db.all(selectAllUsersInRoom, [roomCode, name], (err, rows) => {
-                if (err) {
-                    return console.error(err.message);
-                }
-                rows.forEach(element => {
-                    userList.push(element.username);
-                });
-
-
-                fs.readFile("messages.json", "utf-8", (err, data) => {
+        let data = null;
+        let roomQuestion = null;
+        // TODO: fetch all the info ONLY based on the socket ID, not anything else
+        console.log(`${socket.id}: fetching room`);// of gamecode ${msg.code} and roomid ${msg.name}`);
+        /*try {
+            db.serialize(() => {
+                //this query finds the room and sets roomID and roomQuestion to whatever value the database has for it
+                db.all(selectRoomQuery,[msg.name,msg.code],(err,rows) => {
                     if (err) {
-                        console.error(err.message);
-                    } else {
-                        let obj = JSON.parse(data);
-
-                        let messages = obj[roomCode][name];
-
-                        let res = {
-                            messages: messages,
-                            participants: userList,
-                            roomName: name
-                        }
-
-                        socket.emit("fetchRoom", res);
+                        return console.error("Error selecting room:" + err.message);
                     }
-                });
+                    if (rows == undefined || rows.length == 0) {
+                        throw ('Result undefined');
+                    }
+                    res = rows[0];
+                    roomQuestion = res.Question;
+                    roomID = res.RoomID;})
+
+                //finds all of the users in the room and creates an array with their ids
+                db.all(selectAllUsersInRoom,[msg.code,msg.name],(err,rows) => {
+                    if(err) {
+                        return console.error(err.message);
+                    }
+                    rows.forEach(element => {
+                        userList.push(element.id);
+                    });
+                    //building the data to send back
+                    data = {
+                        roomName: roomID,
+                        participants: userList,
+                        question: roomQuestion
+                    }
+                    console.log(data);
+                    socket.emit("fetchRoom", data);
+                })         
             });
-        });
+        } catch (e) {
+            console.error("Exception in fetchRoom: " + e);
+        }*/
+        // TODO: get the above working with only the socket ID
+        // TODO: Should return MESSAGES, PARTICIPANTS, QUESTION, and ROOM NAME
+        // TODO: Like the format below
+        socket.emit("fetchRoom", { roomName: "Debug", participants: ["p1", "p2", "p3"], question: "Debug question?", messages: [] });
     });
 
     //fetches user and returns all of their column data in an array
@@ -750,6 +760,7 @@ io.on("connection", (socket) => {
       console.log("disconnected");
     });
   });
+
 });
 
 server.listen(3001, () => {
