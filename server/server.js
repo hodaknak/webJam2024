@@ -759,6 +759,73 @@ io.on("connection", (socket) => {
             }
         });
     });
+
+    socket.on("removeRoom", (msg) => {
+        console.log("Remove Room currently uses the socket.id of the host to search the Games table");
+        let GameCode = null;
+        let RoomID = null;
+        let userList = [];
+        let roomList = [];
+        db.all("SELECT * FROM Game where Host = ?", [socket_id],(err,rows) => {
+            if(err) {
+                return console.error(err.message);
+            }
+            console.log(rows)
+            GameCode = rows[0].GameCode
+            db.all(selectAllRoomsInGame,[GameCode],(err,rows) => {
+                if(err) {
+                    return console.error(err.message);
+                }
+                console.log(rows)
+                if(rows.length < 2) {
+                    console.log("Room Cannot Be Removed Because It's The Last One");
+                }
+                else {
+                    db.all("SELECT RoomID FROM Rooms WHERE GameCode = ? ORDER BY RoomID DESC LIMIT 1",[GameCode],(err,rows) => {
+                        if(err) {
+                            return console.error(err.message);
+                        }
+                        RoomID = rows[0].RoomID
+                        db.run("DELETE FROM Rooms WHERE RoomID = ?",[RoomID],(err) => {
+                            if(err) {
+                                return console.error(err.message);
+                            }
+                            console.log("row deleted");
+                            db.all(selectAllUsersInGame, [msg.code], (err, rows) => {
+                                if (err) {
+                                    return console.error(err.message);
+                                }
+                                rows.forEach(element => {
+                                    userList.push(element.id);
+                                });
+                                //this finds all of the rows in the game and creates an array with all of their RoomIDs
+                                db.all(selectAllRoomsInGame, [msg.code], (err, rows) => {
+                                    if (err) {
+                                        return console.error(err.message);
+                                    }
+                                    rows.forEach(element => {
+                                        roomList.push(element.RoomID);
+                                    });
+                                    let roomIndex = 0;
+                                    userList.forEach(element => {
+                                        if(roomIndex == roomList.length) {
+                                            roomIndex = 0;
+                                        }
+                                        db.run("UPDATE Users SET BreakoutRoomCode = ? WHERE id = ?",[roomList[roomIndex],element], (err) => {
+                                            if(err) {
+                                                return console.error(err.message)
+                                            }
+                                        })
+                                        roomIndex++;
+                                    })
+                                });
+                            });
+                        });
+                    });
+                };
+            });
+        });
+    });
       
     socket.on("disconnect", () => {
       console.log("disconnected");
