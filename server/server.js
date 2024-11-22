@@ -88,6 +88,16 @@ io.on("connection", (socket) => {
 
     socket.on("fetchQuestion", (msg) => {
         // TODO: Create a way to fetch questions and emit it
+
+        const fileContent = readFile("/icebreakers.txt", "utf-8");
+        var lines = fileContent.split("\n");
+        
+
+        let result = {
+            randNum = Math.floor(Math.random() * 99)+1;
+            question: lines[randNum]
+        };
+        socket.emit("fetchQuestion", result);
     });
 
     socket.on("username", (data) => {
