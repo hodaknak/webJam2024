@@ -15,9 +15,10 @@ Run the development server for the client side:
 npm run dev
 ```
 
-On a separate shell, run the server side:
+On a separate shell, go to the `server` folder and run the server:
 ```bash
-node server/server.js
+cd server
+node server.js
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
