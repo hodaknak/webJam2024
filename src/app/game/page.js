@@ -12,7 +12,6 @@ const timezoneOffset = new Date().getTimezoneOffset() * 60000;
 
 const fetchRoom = (roomName, code) => {
     let data = {
-        //name: roomName, // We won't have access to this: fetchRoom is supposed to give it to us
         code: code
     }
 
@@ -27,7 +26,7 @@ export default function Game() {
     const [username, setUsername] = useState("");
     const [finishedUsername, setFinishedUsername] = useState(false);
     const [participants, setParticipants] = useState([]);
-    const [roomName, setRoomName] = useState("");
+    const [roomName, setRoomName] = useState('A');
 
     const pathname = usePathname()
     const params = useSearchParams()
@@ -98,7 +97,9 @@ export default function Game() {
         let data = {
             name: username, // the server doesn't actually need this, just put whatever is stored locally
             message: fieldText,
-            datetime: `${hourminute.getHours()}:${hourminute.getMinutes()}`
+            datetime: `${hourminute.getHours()}:${hourminute.getMinutes()}`,
+            room: roomName,
+            code: getGameCode()
         };
 
         socket.emit("msg", data);
@@ -116,7 +117,9 @@ export default function Game() {
         setFinishedUsername(true);
         // TODO: submit the username
         let data = {
-            username: username
+            username: username,
+            code: getGameCode(),
+            room: roomName
         };
         socket.emit("username", data);
         // TODO: update the current username based on the result
