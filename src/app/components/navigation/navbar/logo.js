@@ -9,10 +9,10 @@ export default function Logo() {
         <>
             <Link href="/">
                 <Image
-                    src="/icebreakertest.svg"
+                    src="/icebreaker.svg"
                     alt="logo"
-                    width={60}
-                    height={60}
+                    width={120}
+                    height={120}
                     className="relative"
                 />
             </Link>
