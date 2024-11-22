@@ -24,8 +24,6 @@ export default function Host() {
 
     useEffect(() => {
         socket.on("fetchGame", (msg) => {
-            console.log(msg)
-            console.log("fetched")
             setParticipants(msg.participants);
             setRooms(msg.rooms);
         });
@@ -37,8 +35,13 @@ export default function Host() {
 
         socket.on("createRoom", (msg) => {
             console.log(msg);
+            //console.log([...rooms, msg]);
 
             setRooms((prevRooms) => [...prevRooms, msg]);
+        });
+
+        socket.on("joined", (msg) => {
+            // TODO: update rooms so it updates the cards
         });
 
         socket.emit("createGame", {});
@@ -47,6 +50,8 @@ export default function Host() {
         return () => {
             socket.off("createGame"); // Needed to clean up
             socket.off("fetchGame");
+            socket.off("createRoom");
+            socket.off("joined");
         };
     }, []);
 

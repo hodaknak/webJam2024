@@ -26,7 +26,7 @@ export default function Game() {
     const [username, setUsername] = useState("");
     const [finishedUsername, setFinishedUsername] = useState(false);
     const [participants, setParticipants] = useState([]);
-    const [roomName, setRoomName] = useState('A');
+    const [roomName, setRoomName] = useState('');
 
     const pathname = usePathname()
     const params = useSearchParams()
@@ -51,7 +51,23 @@ export default function Game() {
             // Add the new message
             setMessages((prevMessages) => [...prevMessages, msg]);
             console.log(messages);
-        })
+        });
+
+        // username was updated
+        socket.on("connection", (msg) => {
+            socket.emit("join")
+        });
+
+        socket.on("joined", (msg) => {
+            console.log(msg);
+            console.log(getRoomName())
+
+            if (getRoomName() in msg) {
+                setParticipants(msg[getRoomName()]);
+            } else {
+                setParticipants([]);
+            }
+        });
 
         fetchRoom(getRoomName(), getGameCode());
 
@@ -59,8 +75,10 @@ export default function Game() {
         return () => {
             socket.off("fetchRoom");
             socket.off("msg");
+            socket.off("connection");
+            socket.off("joined");
         };
-    }, []);
+    }, [roomName]);
 
     const getGameCode = () => {
         // Get the room code
