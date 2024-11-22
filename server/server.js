@@ -26,7 +26,13 @@ const db = new sqlite3.Database(
   }
 );
 
+const fs = require('fs');
 
+fs.writeFile("./messages.json", JSON.stringify({}), "utf8", (err) => {
+    if (err) {
+        throw err;
+    }
+});
 
 //Creating all of the tables inside of the db
 db.serialize(() => {
@@ -100,7 +106,6 @@ db.serialize(() => {
     //Filling questionList with questions. It has to be done like this or the programs tries to insert the information before the table is created
     const checkTables = () => {
         if (roomTableMade && userTableMade && roomTableMade && questionsTableMade) {
-            const fs = require('fs');
             fs.readFile('questions.json', 'utf-8', (err, data) => {
                 if (err) {
                     console.error("File cannot be read: ", err);
@@ -240,6 +245,23 @@ io.on("connection", (socket) => {
             newGameCode += String.fromCharCode(('a'.charCodeAt(0) + Math.floor(Math.random() * 26)))
         }
         console.log(`${socket.id}: creating game of code ${newGameCode}`);
+
+        fs.readFile("messages.json", "utf-8", (err, data) => {
+            if (err) {
+                console.error(err.message);
+            } else {
+                let obj = JSON.parse(data);
+
+                obj[newGameCode] = {}
+
+                fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                    if (err) {
+                        console.error(err.message);
+                    }
+                })
+            }
+        })
+
         // TODO: error handling
         // Return the result
         let res = {
