@@ -36,9 +36,11 @@ export default function Game() {
     // so we don't have to fetch from the database every time. The server will broadast the message to every other client so
     // they can do the same
     // the database will only be used when a new user joins the room, and has to fetch all the past messages
-    // so we fetch the messages from database here
+    // so we fetch the messages from database
 
     useEffect(() => {
+        console.log("effect")
+
         socket.on("fetchRoom", (msg) => {
             setMessages(msg.messages);
             setParticipants(msg.participants);
@@ -54,7 +56,11 @@ export default function Game() {
 
         fetchRoom(getRoomName(), getGameCode());
 
-        //return () => socket.off("fetchRoom"); // Needed to clean up?
+        // destructor
+        return () => {
+            socket.off("fetchRoom");
+            socket.off("msg")
+        };
     }, []);
 
     const getGameCode = () => {
