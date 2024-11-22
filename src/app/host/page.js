@@ -42,6 +42,24 @@ export default function Host() {
 
         socket.on("joined", (msg) => {
             // TODO: update rooms so it updates the cards
+
+            let updatedRooms = msg;
+
+            for (let i = 0; i < rooms.length; i++) {
+                let roomName = rooms[i].name;
+
+                if (!(roomName in updatedRooms)) {
+                    updatedRooms[roomName] = [];
+                }
+            };
+
+            let output = []
+
+            for (let roomName of Object.keys(updatedRooms)) {
+                output.push({name: roomName, users: updatedRooms[roomName]});
+            }
+
+            setRooms(output);
         });
 
         socket.emit("createGame", {});
