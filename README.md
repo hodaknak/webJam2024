@@ -1,4 +1,4 @@
-# WebJam 2024
+# WebJam 2024: Crushed
 
 ## Purpose
 We're hoping to streamline the process of icebreakers for physical and online meetings into a fun, simple app!
@@ -15,7 +15,7 @@ Run the development server for the client side:
 npm run dev
 ```
 
-On a separate shell, go to the `server` folder and run the server:
+On a separate shell, go to the `server` folder (this step is important) and run the server:
 ```bash
 cd server
 node server.js
@@ -29,7 +29,7 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## Usage (for users)
 
-Host: just go to the homepage, click `Create a game`, and give all participants the room code. You will not be able to participate yourself, but you will be able to monitor who has joined.
+Host: just go to the homepage, click `Create a game`, create a room, and give all participants the room code. You will not be able to participate yourself, but you will be able to monitor who has joined.
 
 Participant: just go to the homepage, enter the room code in the box, and click `Join game`.
 
