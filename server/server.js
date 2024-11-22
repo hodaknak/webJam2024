@@ -273,6 +273,42 @@ io.on("connection", (socket) => {
             ]*/
         };
         socket.emit("createGame", res);
+    })
+
+    socket.on("createRoom", (msg) => {
+        // create a room
+        let gameCode = msg.code;
+
+        let roomName = 'A';
+
+        let data = [roomName, gameCode]
+
+        db.run(insertRoomQuery, data,(err) => {
+            if (err) {
+                return console.error(err.message);
+            }
+            console.log("Room Inserted");
+        });
+
+        fs.readFile("messages.json", "utf-8", (err, data) => {
+            if (err) {
+                console.error(err.message);
+            } else {
+                let obj = JSON.parse(data);
+
+                if (gameCode in obj) {
+                    obj[gameCode][roomName] = []
+
+                    fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                        if (err) {
+                            console.error(err.message);
+                        }
+                    })
+                }
+            }
+        });
+
+        socket.emit("createRoom", {roomName: roomName});
     });
     
     socket.on("fetchGame", (msg) => {
