@@ -25,7 +25,7 @@ export default function SocketTest() {
             username: "John"
             
         }
-        socket.emit("username",data);
+        socket.emit("fetchGame",data);
     }
 
     return (
@@ -35,7 +35,7 @@ export default function SocketTest() {
                 <button onClick={fetchMessages}>request room data</button>
             </div>
             <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-            <div>hello</div>
+            <div>bye</div>
         </div>
     )
 }
