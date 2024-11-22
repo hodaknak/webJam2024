@@ -17,13 +17,11 @@ const fetchGame = () => {
 }
 
 export default function Host() {
-    // TODO: connect to the server to get the generated game code and start the game
-
     const [participants, setParticipants] = useState([])
+    const [rooms, setRooms] = useState([])
     const [gameCode, setGameCode] = useState("")
 
     let getGameCode = () => {
-        // TODO: get the unique one-time game code based on the current user's connection
         if (gameCode.length == 0) {
             return "In progress..."
         } else {
@@ -33,16 +31,23 @@ export default function Host() {
 
     useEffect(() => {
         socket.on("fetchGame", (msg) => {
+            console.log(msg)
+            console.log("fetched")
             setParticipants(msg.participants);
+            setRooms(msg.rooms);
         });
 
         socket.on("createGame", (msg) => {
             setGameCode(msg.code);
+            socket.emit("fetchGame", {});
         });
 
         socket.emit("createGame", {});
 
-        //return () => socket.off("createGame"); // Needed to clean up?
+        return () => {
+            socket.off("createGame"); // Needed to clean up
+            socket.off("fetchGame");
+        };
     }, []);
 
     const getParticipants = () => {
@@ -50,6 +55,27 @@ export default function Host() {
         // TODO: get all rooms
         let res = participants;
         return res;
+    }
+
+    const getRooms = () => {
+        // Should be like [{"name": "A", "users": ["user 1", "user 2"]}, {"name": "B", "users": ["user 3"]}]
+        //let res = [{"name": "A", "users": ["user 1", "user 2"]}, {"name": "B", "users": ["user 3"]}];
+        return rooms;
+    }
+
+    const hostAddRoom = () => {
+        // TODO: connect to socket and attempt
+        // TODO: update/fetch afterwards
+    }
+
+    const hostRemoveRoom = () => {
+        // TODO: connect to socket and attempt
+        // TODO: update/fetch afterwards
+    }
+
+    const hostShuffleParticipants = () => {
+        // TODO: connect to socket and attempt
+        // TODO: update/fetch afterwards
     }
 
     return (
@@ -69,6 +95,26 @@ export default function Host() {
                 <br/>Don't reload this page.
             </p>
             <br/>
+            <button onClick={hostAddRoom}>+ Add a room</button>
+            <button onClick={hostRemoveRoom}>- Remove a room</button>
+            <br/>
+            <button onClick={hostShuffleParticipants}>Shuffle/distribute participants</button>
+            <p className="text-xl mt-20">
+                Rooms:
+            </p>
+            <div style={{"display": "flex", "flexWrap": "wrap"}}>
+                {getRooms().map((item, index) => (
+                    <div className="roombox" key={index}>
+                        <span style={{"fontWeight": "bold"}}>Room {item.name}</span>
+                        <br/>
+                        <ul>
+                            {item.users.map((user, i2) => (
+                                <span key={i2}>{user}<br/></span>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </div>
             {/* TODO: List of participants */}
             <p className="m-40">
                 Welcome to the game!

@@ -12,7 +12,67 @@ const io = require("socket.io")(server, {
     }
 });
 
+const sqlite3 = require("sqlite3").verbose();
 
+// Creating or connecting to db
+const db = new sqlite3.Database(
+  "./collection.db",
+  sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
+  (err) => {
+    if (err) {
+      return console.error(err.message);
+    }
+    console.log("Connected to the SQlite database.");
+  }
+);
+
+//Creating all of the tables inside of the db
+db.serialize(() => {
+    db.run("DROP TABLE IF EXISTS Game");
+    db.run(
+        `CREATE TABLE IF NOT EXISTS Game (
+        GameCode INTEGER PRIMARY KEY,
+        Host TEXT,
+        Messages TEXT,
+        GameState TEXT
+        )`,
+        (err) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        console.log("Created Game table.");
+        }
+    );
+    db.run("DROP TABLE IF EXISTS Users");
+    db.run(
+      `CREATE TABLE IF NOT EXISTS Users (
+        id INTEGER PRIMARY KEY,
+        Username TEXT,
+        GameCode TEXT,
+        BreakoutRoomCode TEXT
+      )`,
+      (err) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log("Created Users table.");
+      }
+    );
+    db.run("DROP TABLE IF EXISTS Rooms");
+    db.run(
+      `CREATE TABLE IF NOT EXISTS Rooms (
+        RoomID TEXT,
+        GameCode TEXT,
+        PRIMARY KEY (RoomID, GameCode)
+      )`,
+      (err) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log("Created Rooms table.");
+      }
+    );
+});
 
 //let Server = require("socket.io");
 
@@ -155,11 +215,7 @@ io.on("connection", (socket) => {
         // dummy response, actual one will fetch from db
         let res = {
             participants: ["Hodaka's ID", "Caden's ID", "Kyle's ID", "Kelvin's ID", "Green's ID", "Red's ID", "Blue's ID"],
-            rooms: [
-                {
-                    name: "A"
-                }
-            ]
+            rooms: [{"name": "A", "users": ["user 1", "user 2"]}, {"name": "C", "users": ["user 3"]}, {"name": "D", "users": ["user 3"]}, {"name": "B", "users": ["user 3"]}, {"name": "B", "users": ["user 3"]}, {"name": "B", "users": ["user 3"]}, {"name": "B", "users": ["user 3"]}]
         };
 
         socket.emit("fetchGame", res);
@@ -218,19 +274,3 @@ server.listen(3001, () => {
 });
 
 //export default io;
-
-
-
-const sqlite3 = require("sqlite3").verbose();
-
-// Creating or connecting to db
-const db = new sqlite3.Database(
-  "./collection.db",
-  sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
-  (err) => {
-    if (err) {
-      return console.error(err.message);
-    }
-    console.log("Connected to the SQlite database.");
-  }
-);

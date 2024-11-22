@@ -40,6 +40,16 @@ body {
     outline: solid 2px rgb(105, 208, 255);
 }
 
+.roombox {
+    width: 200px;
+    height: 200px;
+    background-color: rgb(247, 249, 250);
+    border-radius: 8px;
+    margin: 10px;
+    text-align: center;
+    border: solid 1px rgb(200, 200, 200);
+}
+
 .codebox {
     font-family: monospace;
     font-size: 20px;
