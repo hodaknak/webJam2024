@@ -321,57 +321,55 @@ io.on("connection", (socket) => {
         let roomName = '';
 
         // gets the latest room added (sorted in alphabetical order), so we can make a new room with the next alphabet
-        db.serialize(() => {
-            let query = "SELECT RoomID FROM rooms WHERE GameCode = ? ORDER BY RoomID DESC LIMIT 1"
 
-            let data;
+        let query = "SELECT RoomID FROM rooms WHERE GameCode = ? ORDER BY RoomID DESC LIMIT 1"
 
-            db.all(query, [gameCode], (err, rows) => {
+        let data;
+
+        db.all(query, [gameCode], (err, rows) => {
+            if (err) {
+                return console.error(err.message);
+            }
+
+            console.log("Query result: ", rows);
+
+            if (rows.length === 0) {
+                roomName = 'A';
+            } else {
+                let roomid = rows[0].RoomID;
+
+                roomName = String.fromCharCode(roomid.charCodeAt(0) + 1);
+            }
+
+            data = [roomName, gameCode];
+
+            db.run(insertRoomQuery, data,(err) => {
                 if (err) {
                     return console.error(err.message);
                 }
+                console.log("Room Inserted");
 
-                console.log("Query result: ", rows);
-
-                if (rows.length === 0) {
-                    roomName = 'A';
-                } else {
-                    let roomid = rows[0].RoomID;
-
-                    roomName = String.fromCharCode(roomid.charCodeAt(0) + 1);
-                }
-
-                data = [roomName, gameCode];
-
-                db.run(insertRoomQuery, data,(err) => {
+                fs.readFile("messages.json", "utf-8", (err, data) => {
                     if (err) {
-                        return console.error(err.message);
+                        console.error(err.message);
+                    } else {
+                        let obj = JSON.parse(data);
+
+                        if (gameCode in obj) {
+                            obj[gameCode][roomName] = []
+
+                            fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                                if (err) {
+                                    console.error(err.message);
+                                } else {
+                                    socket.emit("createRoom", {name: roomName, users: []});
+                                }
+                            })
+                        }
                     }
-                    console.log("Room Inserted");
                 });
             });
         });
-
-        fs.readFile("messages.json", "utf-8", (err, data) => {
-            if (err) {
-                console.error(err.message);
-            } else {
-                let obj = JSON.parse(data);
-
-                if (gameCode in obj) {
-                    obj[gameCode][roomName] = []
-
-                    fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
-                        if (err) {
-                            console.error(err.message);
-                        }
-                    })
-                }
-            }
-        });
-
-        socket.emit("createRoom", {roomName: roomName});
-
     });
 
     socket.on("fetchGame", (msg) => {

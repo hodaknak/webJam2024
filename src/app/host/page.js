@@ -37,6 +37,8 @@ export default function Host() {
 
         socket.on("createRoom", (msg) => {
             console.log(msg);
+
+            setRooms((prevRooms) => [...prevRooms, msg]);
         });
 
         socket.emit("createGame", {});
