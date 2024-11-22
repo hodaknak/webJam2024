@@ -106,13 +106,13 @@ db.serialize(() => {
     //Filling questionList with questions. It has to be done like this or the programs tries to insert the information before the table is created
     const checkTables = () => {
         if (roomTableMade && userTableMade && roomTableMade && questionsTableMade) {
-          /*db.run("INSERT INTO Rooms(RoomID,GameCode,Question) VALUES(?, ?, ?)", ["1234", "ABCD", "d"], (err) => {
+          db.run("INSERT INTO Game(GameCode,Host,Messages,GameState) VALUES(?, ?, ?, ?)", ["1234", "ABCD", "d"], (err) => {
               console.log("im here");
               if (err) {
                 return console.error(err.message);
               }
-              console.log("1 stuff got inserted");
-            })*/
+              console.log("stuff got inserted");
+            })
             const fs = require('fs');
             fs.readFile('questions.json', 'utf-8', (err, data) => {
                 if (err) {
@@ -210,19 +210,18 @@ io.on("connection", (socket) => {
     });
 
     socket.on("fetchQuestion", (msg) => {
-        // TODO: Create a way to fetch questions and emit it
-        
-        let result = null;
-        db.all(selectQuestionQuery,[msg.id],(err,rows) => {
+        let res = null;
+        let id = Math.floor(Math.random() * 100) + 1;
+        db.all(selectQuestionQuery,[id],(err,rows) => {
           if (err) {
             return console.error(err.message);
           }
-          console.log("Query result: ", rows);
           res = rows[0].Question;
+          if(res != null) {
+            console.log(`Question fetched: ${res}`);
+            socket.emit("fetchQuestion", res);
+          }
         });
-        if(result != null) {
-          socket.emit("fetchQuestion", result);
-        }
     });
 
     socket.on("username", (data) => {
@@ -246,13 +245,14 @@ io.on("connection", (socket) => {
     });
 
     socket.on("createGame", (msg) => {
+        // Generates the game, emits the code
+
         // Generate the code
         // TODO: check for clashes with the database and regenerate if that is the case
         // TODO: what happens if every code is used up?
         let newGameCode = "";
         let res = null;
         let valid = false;
-        console.log("Trying to make room");
         db.serialize(() => {
           //ill figure out the unique thing later
           while(valid == false) {
@@ -265,60 +265,55 @@ io.on("connection", (socket) => {
               if (err) {
                 return console.error(err.message);
               }
-              console.log(rows);
-              console.log(rows.length);
               if(rows.length == 0) {
                 valid = true;
-                console.log("i made here");
+                console.log(`${socket.id}: creating game of code ${newGameCode}`);
+                db.run(insertGameQuery,[newGameCode,socket.id,"","waiting"],(err) => {
+                  if (err) {
+                    return console.error(err.message);
+                  }
+                  console.log("Game Created");
+                  res = newGameCode;
+                  fs.readFile("messages.json", "utf-8", (err, data) => {
+                    if (err) {
+                        console.error(err.message);
+                    } else {
+                        let obj = JSON.parse(data);
+        
+                        obj[newGameCode] = {}
+        
+                        fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                            if (err) {
+                                console.error(err.message);
+                            }
+                        })
+                    }
+                })
+                console.log(`Gamecode: ${res}`);
+                socket.emit("createGame", res);
+                });
               }
             });
             valid = true;
           }
-          console.log(`${socket.id}: creating game of code ${newGameCode}`);
-          db.run(insertGameQuery,[newGameCode,socket.id,"","waiting"],(err) => {
-            if (err) {
-              return console.error(err.message);
-            }
-            console.log("Game Created");
-          });
         });
-        fs.readFile("messages.json", "utf-8", (err, data) => {
-            if (err) {
-                console.error(err.message);
-            } else {
-                let obj = JSON.parse(data);
-
-                obj[newGameCode] = {}
-
-                fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
-                    if (err) {
-                        console.error(err.message);
-                    }
-                })
-            }
-        })
 
         // TODO: error handling
-        socket.emit("createGame", res);
     });
     
     socket.on("fetchGame", (msg) => {
         // object should have code field
 
-        // TODO: fetch from db
-        // TODO: error handling
         let res = null;
         console.log(`${socket.id}: fetching game of code ${msg.code}`);
         db.all(selectGameQuery,[msg.code],(err,rows) => {
           if (err) {
             return console.error(err.message);
           }
-          console.log("Query result: ", rows);
           res = rows[0]
-        });
-        if(res != null) {
+          console.log(`Game: ${res}`);
           socket.emit("fetchGame", res);
-        }
+        });
     });
 
     socket.on("fetchRoom", (msg) => {
