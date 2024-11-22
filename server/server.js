@@ -282,64 +282,151 @@ io.on("connection", (socket) => {
         let valid = false;
         let codes = [];
         db.all("SELECT * FROM Game",(err,rows) => {
-          if (err) {
-            return console.error(err.message);
-          }
-          rows.forEach(element => {
-            codes.push(element.GameCode)
-          });
-          while(valid == false) {
-            newGameCode = "";
-            for (let i = 0; i < 4; i++) {
-              newGameCode += String.fromCharCode(('a'.charCodeAt(0) + Math.floor(Math.random() * 26)))
-            }
-            if(!codes.includes(newGameCode)) {
-              valid = true;
-            }
-            else {
-              console.log("code repeated");
-            }
-          }
-          db.run(insertGameQuery,[newGameCode,msg.host_id,"","waiting"],(err) => {
             if (err) {
-              return console.error(err.message);
+                return console.error(err.message);
             }
-            console.log("Game Created");
-            res = newGameCode;
-            fs.readFile("messages.json", "utf-8", (err, data) => {
-              if (err) {
-                  console.error(err.message);
-              } else {
-                  let obj = JSON.parse(data);
-  
-                  obj[newGameCode] = {}
-  
-                  fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
-                      if (err) {
-                          console.error(err.message);
-                      }
-                  })
-                }});
-            console.log(`Gamecode: ${res}`);
-            socket.emit("createGame",res);
-              })
+            rows.forEach(element => {
+                codes.push(element.GameCode)
+            });
+
+            while(valid == false) {
+                newGameCode = "";
+
+                for (let i = 0; i < 4; i++) {
+                  newGameCode += String.fromCharCode(('a'.charCodeAt(0) + Math.floor(Math.random() * 26)))
+                }
+                if(!codes.includes(newGameCode)) {
+                  valid = true;
+                } else {
+                  console.log("code repeated");
+                }
+            }
+            db.run(insertGameQuery,[newGameCode,msg.host_id,"","waiting"],(err) => {
+                if (err) {
+                  return console.error(err.message);
+                }
+                console.log("Game Created");
+                res = {code: newGameCode};
+
+                fs.readFile("messages.json", "utf-8", (err, data) => {
+                    if (err) {
+                    console.error(err.message);
+                    } else {
+                        let obj = JSON.parse(data);
+
+                        obj[newGameCode] = {}
+
+                        fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                            if (err) {
+                                console.error(err.message);
+                            }
+                        })
+                    }});
+
+                console.log(`Gamecode: ${res}`);
+                socket.emit("createGame",res);
+            })
         });
+    })
+
+    socket.on("createRoom", (msg) => {
+        // create a room
+        let gameCode = msg.code;
+
+        let roomName = '';
+
+        // gets the latest room added (sorted in alphabetical order), so we can make a new room with the next alphabet
+        db.serialize(() => {
+            let query = "SELECT RoomID FROM rooms WHERE GameCode = ? ORDER BY RoomID DESC LIMIT 1"
+
+            let data;
+
+            db.all(query, [gameCode], (err, rows) => {
+                if (err) {
+                    return console.error(err.message);
+                }
+
+                console.log("Query result: ", rows);
+
+                if (rows.length === 0) {
+                    roomName = 'A';
+                } else {
+                    let roomid = rows[0].RoomID;
+
+                    roomName = String.fromCharCode(roomid.charCodeAt(0) + 1);
+                }
+
+                data = [roomName, gameCode];
+
+                db.run(insertRoomQuery, data,(err) => {
+                    if (err) {
+                        return console.error(err.message);
+                    }
+                    console.log("Room Inserted");
+                });
+            });
+        });
+
+        fs.readFile("messages.json", "utf-8", (err, data) => {
+            if (err) {
+                console.error(err.message);
+            } else {
+                let obj = JSON.parse(data);
+
+                if (gameCode in obj) {
+                    obj[gameCode][roomName] = []
+
+                    fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                        if (err) {
+                            console.error(err.message);
+                        }
+                    })
+                }
+            }
+        });
+
+        socket.emit("createRoom", {roomName: roomName});
+
     });
-    
+
     socket.on("fetchGame", (msg) => {
-        // object should have code field
 
         let res = null;
+        let userList = [];
+        let roomList = [];
         console.log(`${socket.id}: fetching game of code ${msg.code}`);
-        db.all(selectGameQuery,[msg.code],(err,rows) => {
-          if (err) {
-            return console.error(err.message);
-          }
-          res = rows[0]
-          console.log(res);
-          socket.emit("fetchGame", res);
+        db.all(selectGameQuery, [msg.code], (err, rows) => {
+            if (err) {
+                return console.error(err.message);
+            }
+            res = rows[0]
+            db.all(selectAllUsersInGame, [msg.code], (err, rows) => {
+                if (err) {
+                    return console.error(err.message);
+                }
+                rows.forEach(element => {
+                    userList.push(element.id);
+                });
+                db.all(selectAllRoomsInGame, [msg.code], (err, rows) => {
+                    if (err) {
+                        return console.error(err.message);
+                    }
+                    rows.forEach(element => {
+                        roomList.push(element.id);
+                    })
+                    let data = {
+                        participants: userList,
+                        rooms: roomList
+                    }
+                    console.log(data);
+                    socket.emit("fetchGame", data);
+                })
+            });
+
         });
     });
+
+
 
     socket.on("fetchRoom", (msg) => {
         // object should have name and code field

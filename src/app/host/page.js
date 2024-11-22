@@ -35,6 +35,10 @@ export default function Host() {
             socket.emit("fetchGame", {code: msg.code});
         });
 
+        socket.on("createRoom", (msg) => {
+            console.log(msg);
+        });
+
         socket.emit("createGame", {});
         console.log("effect")
 
@@ -60,6 +64,9 @@ export default function Host() {
     const hostAddRoom = () => {
         // TODO: connect to socket and attempt
         // TODO: update/fetch afterwards
+
+        socket.emit("createRoom", {code: gameCode});
+
     }
 
     const hostRemoveRoom = () => {
