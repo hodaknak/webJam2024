@@ -18,6 +18,7 @@ const fetchGame = () => {
 
 export default function Host() {
     const [participants, setParticipants] = useState([])
+    const [rooms, setRooms] = useState([])
     const [gameCode, setGameCode] = useState("")
 
     let getGameCode = () => {
@@ -33,6 +34,7 @@ export default function Host() {
             console.log(msg)
             console.log("fetched")
             setParticipants(msg.participants);
+            setRooms(msg.rooms);
         });
 
         socket.on("createGame", (msg) => {
@@ -56,11 +58,9 @@ export default function Host() {
     }
 
     const getRooms = () => {
-        // Should be like [{"roomname": "A", "users": ["user 1", "user 2"]}, {"roomname": "B", "users": ["user 3"]}]
-        //let res = [{"roomname": "A", "users": ["user 1", "user 2"]}, {"roomname": "B", "users": ["user 3"]}];
-        let res = [{"roomname": "A", "users": ["user 1", "user 2"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}];
-        console.log("got rooms: " + res)
-        return res;
+        // Should be like [{"name": "A", "users": ["user 1", "user 2"]}, {"name": "B", "users": ["user 3"]}]
+        //let res = [{"name": "A", "users": ["user 1", "user 2"]}, {"name": "B", "users": ["user 3"]}];
+        return rooms;
     }
 
     const hostAddRoom = () => {
@@ -105,7 +105,7 @@ export default function Host() {
             <div style={{"display": "flex", "flexWrap": "wrap"}}>
                 {getRooms().map((item, index) => (
                     <div className="roombox" key={index}>
-                        <span style={{"fontWeight": "bold"}}>Room {item.roomname}</span>
+                        <span style={{"fontWeight": "bold"}}>Room {item.name}</span>
                         <br/>
                         <ul>
                             {item.users.map((user, i2) => (

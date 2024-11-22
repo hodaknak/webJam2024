@@ -141,11 +141,7 @@ io.on("connection", (socket) => {
         // dummy response, actual one will fetch from db
         let res = {
             participants: ["Hodaka's ID", "Caden's ID", "Kyle's ID", "Kelvin's ID", "Green's ID", "Red's ID", "Blue's ID"],
-            rooms: [
-                {
-                    name: "A"
-                }
-            ]
+            rooms: [{"name": "A", "users": ["user 1", "user 2"]}, {"name": "C", "users": ["user 3"]}, {"name": "D", "users": ["user 3"]}, {"name": "B", "users": ["user 3"]}, {"name": "B", "users": ["user 3"]}, {"name": "B", "users": ["user 3"]}, {"name": "B", "users": ["user 3"]}]
         };
 
         socket.emit("fetchGame", res);
