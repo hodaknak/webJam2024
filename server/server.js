@@ -828,6 +828,20 @@ io.on("connection", (socket) => {
                                             io.to(element.id).emit("updateSelf", {});
                                         });
                                     });
+
+                                    db.all(selectAllRoomsInGame, [GameCode], (err, rows) => {
+                                        if (err) {
+                                            return console.log(err.message);
+                                        }
+
+                                        let res = []
+
+                                        rows.forEach(element => {
+                                            res.push({name: element.RoomID, users: []});
+                                        });
+
+                                        socket.emit("updateRooms", res);
+                                    })
                                 });
                             });
                         });
