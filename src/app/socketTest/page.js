@@ -21,10 +21,11 @@ export default function SocketTest() {
             host_id: "123489",
             code: "ABCD",
             name: "1234",
-            id: "1"
+            id: "1",
+            username: "John"
             
         }
-        socket.emit("createGame",data);
+        socket.emit("fetchRoom",data);
     }
 
     return (
