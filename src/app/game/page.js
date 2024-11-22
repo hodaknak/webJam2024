@@ -57,6 +57,7 @@ export default function Game() {
 
         // username was updated
         socket.on("connection", (msg) => {
+            setUsername(msg);
             socket.emit("join")
         });
 
