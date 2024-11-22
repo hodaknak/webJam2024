@@ -207,17 +207,43 @@ io.on("connection", (socket) => {
 
         console.log(`${user}: ${message} ${datetime}`);
 
+        db.all(selectUserQuery, [user], (err, rows) => {
+            if (err) {
+                return console.error(err.message);
+            }
+
+            let name = rows[0].Username;
+
+            let res = {
+                name: name,
+                message: message,
+                datetime: datetime
+            };
+
+            fs.readFile("messages.json", "utf-8", (err, data) => {
+                if (err) {
+                    console.error(err.message);
+                } else {
+                    let obj = JSON.parse(data);
+
+                    obj[msg.code][msg.room].push(res);
+
+                    fs.writeFile("messages.json", JSON.stringify(obj), (err) => {
+                        if (err) {
+                            console.error(err.message);
+                        } else {
+                            // TODO: only send to people in room
+
+                            io.emit("msg", res);
+                        }
+                    })
+                }
+            });
+        })
+
         // TODO: add message to database
         // TODO: fetch name from database
         // TODO: get all socket ids in the room, use io.sockets.socket(socketid).emit() to send to all clients in room
-
-        let res = {
-            name: `whoever ${user} is`,
-            message: message,
-            datetime: datetime
-        };
-
-        io.emit("msg", res);
     });
 
     socket.on("username", (msg) => {
@@ -306,7 +332,8 @@ io.on("connection", (socket) => {
                                 console.error(err.message);
                             }
                         })
-                    }});
+                    }
+                });
 
                 console.log(`Gamecode: ${res}`);
                 socket.emit("createGame",res);
@@ -414,35 +441,20 @@ io.on("connection", (socket) => {
     socket.on("fetchRoom", (msg) => {
         // object should have name and code field
         // TODO: fetch the room name, the participants in the room, and the messages in the room from db (based on the user's socket ID)
-        let res = null;
-        let roomID = null;
-        let userList = [];
-        let data = null;
-        let roomQuestion = null;
-        console.log(`${socket.id}: fetching room of gamecode ${msg.code} and roomid ${msg.name}`);
-        db.serialize(() => {
-          db.all(selectRoomQuery,[msg.name,msg.code],(err,rows) => {
+        // TODO: handle non existent room code
+
+        let roomCode = msg.code;
+
+        // select a random room
+
+        let query = "SELECT RoomID FROM Rooms WHERE GameCode = ? ORDER BY RANDOM() LIMIT 1;"
+
+        db.all(selectRoomQuery, [roomCode], (err, rows) => {
             if (err) {
-              return console.error(err.message);
+                return console.error(err.message);
             }
-            res = rows[0];
-            roomQuestion = res.Question;
-            roomID = res.RoomID;})
-          db.all(selectAllUsersInRoom,[msg.code,msg.name],(err,rows) => {
-            if(err) {
-              return console.error(err.message);
-            }
-            rows.forEach(element => {
-              userList.push(element.id);
-            });
-            data = {
-              roomName: roomID,
-              participants: userList,
-              question: roomQuestion
-            }
-            console.log(data);
-            socket.emit("fetchRoom", data);
-          })         
+
+            let id = rows[0].RoomID;
         });
     });
 
