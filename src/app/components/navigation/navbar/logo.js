@@ -9,7 +9,7 @@ export default function Logo() {
         <>
             <Link href="/">
                 <Image
-                    src="/favicon.ico"
+                    src="/icebreakertest.svg"
                     alt="logo"
                     width={60}
                     height={60}
