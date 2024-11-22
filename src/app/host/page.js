@@ -17,13 +17,10 @@ const fetchGame = () => {
 }
 
 export default function Host() {
-    // TODO: connect to the server to get the generated game code and start the game
-
     const [participants, setParticipants] = useState([])
     const [gameCode, setGameCode] = useState("")
 
     let getGameCode = () => {
-        // TODO: get the unique one-time game code based on the current user's connection
         if (gameCode.length == 0) {
             return "In progress..."
         } else {
@@ -33,22 +30,36 @@ export default function Host() {
 
     useEffect(() => {
         socket.on("fetchGame", (msg) => {
+            console.log(msg)
+            console.log("fetched")
             setParticipants(msg.participants);
         });
 
         socket.on("createGame", (msg) => {
             setGameCode(msg.code);
+            socket.emit("fetchGame", {});
         });
 
         socket.emit("createGame", {});
 
-        //return () => socket.off("createGame"); // Needed to clean up?
+        return () => {
+            socket.off("createGame"); // Needed to clean up
+            socket.off("fetchGame");
+        };
     }, []);
 
     const getParticipants = () => {
         // Get a list of all the participants in the current game
         // TODO: get all rooms
         let res = participants;
+        return res;
+    }
+
+    const getRooms = () => {
+        // Should be like [{"roomname": "A", "users": ["user 1", "user 2"]}, {"roomname": "B", "users": ["user 3"]}]
+        //let res = [{"roomname": "A", "users": ["user 1", "user 2"]}, {"roomname": "B", "users": ["user 3"]}];
+        let res = [{"roomname": "A", "users": ["user 1", "user 2"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}, {"roomname": "B", "users": ["user 3"]}];
+        console.log("got rooms: " + res)
         return res;
     }
 
@@ -69,6 +80,26 @@ export default function Host() {
                 <br/>Don't reload this page.
             </p>
             <br/>
+            <button>+ Add a room</button>
+            <button>- Remove a room</button>
+            <br/>
+            <button>Shuffle/distribute participants</button>
+            <p className="text-xl mt-20">
+                Rooms:
+            </p>
+            <div style={{"display": "flex", "flexWrap": "wrap"}}>
+                {getRooms().map((item, index) => (
+                    <div className="roombox" key={index}>
+                        <span style={{"fontWeight": "bold"}}>Room {item.roomname}</span>
+                        <br/>
+                        <ul>
+                            {item.users.map((user, i2) => (
+                                <span key={i2}>{user}<br/></span>
+                            ))}
+                        </ul>
+                    </div>
+                ))}
+            </div>
             {/* TODO: List of participants */}
             <p className="m-40">
                 Welcome to the game!
