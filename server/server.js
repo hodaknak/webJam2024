@@ -106,24 +106,48 @@ db.serialize(() => {
     //Filling questionList with questions. It has to be done like this or the programs tries to insert the information before the table is created
     const checkTables = () => {
         if (roomTableMade && userTableMade && roomTableMade && questionsTableMade) {
-          /*db.run("INSERT INTO Rooms(RoomID,GameCode,Question) VALUES(?, ?, ?)", ["1234","ABCD","is hot dog a sandwich"], (err) => {
+          db.run("INSERT INTO Game(GameCode, Host, Messages, GameState) VALUES(?, ?, ?, ?)", ["ABCD","Jeff","","playing"], (err) => {
+            if (err) {
+              return console.error(err.message);
+            }
+            console.log("room inserted");
+          })
+          db.run("INSERT INTO Rooms(RoomID,GameCode,Question) VALUES(?, ?, ?)", ["1000","ABCD","is hot dog a sandwich"], (err) => {
               if (err) {
                 return console.error(err.message);
               }
               console.log("room inserted");
             })
-          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["2","John2","",""], (err) => {
+          db.run("INSERT INTO Rooms(RoomID,GameCode,Question) VALUES(?, ?, ?)", ["1001","ABCD","is hot dog a taco"], (err) => {
+            if (err) {
+              return console.error(err.message);
+            }
+            console.log("room inserted");
+          })
+          db.run("INSERT INTO Rooms(RoomID,GameCode,Question) VALUES(?, ?, ?)", ["1002","ABCD","is hot dog a burritio"], (err) => {
+            if (err) {
+              return console.error(err.message);
+            }
+            console.log("room inserted");
+          })
+          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["2","John5","ABCD","1000"], (err) => {
             if (err) {
               return console.error(err.message);
             }
             console.log("User inserted");
           })
-          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["3","John3","",""], (err) => {
+          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["3","John2","ABCD","1001"], (err) => {
             if (err) {
               return console.error(err.message);
             }
             console.log("User inserted");
-          })*/
+          })
+          db.run("INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)", ["4","John3","ABCD","1002"], (err) => {
+            if (err) {
+              return console.error(err.message);
+            }
+            console.log("User inserted");
+          })
             const fs = require('fs');
             fs.readFile('questions.json', 'utf-8', (err, data) => {
                 if (err) {
@@ -180,7 +204,7 @@ io.on("connection", (socket) => {
     }*/
     const insertGameQuery = "INSERT INTO Game(GameCode, Host, Messages, GameState) VALUES(?, ?, ?, ?)"
     const insertUserQuery = "INSERT INTO Users(id, Username, GameCode, BreakoutRoomCode) VALUES(?, ?, ?, ?)"
-    const insertRoomQuery = "INSERT INTO rooms (RoomID,GameCode) Values(?,?)";
+    const insertRoomQuery = "INSERT INTO rooms (RoomID,GameCode,Question) Values(?,?,?)";
     const removeGameQuery = "DELETE FROM Game WHERE GameCode = ?";
     const removeUserQuery = "DELETE FROM Users WHERE id = ?"
     const removeRoomQuery = "DELETE FROM rooms WHERE RoomID = ? AND GameCode = ?"
@@ -198,7 +222,7 @@ io.on("connection", (socket) => {
     const selectQuestionQuery = "SELECT * FROM questions where id = ?"
     const selectAllUsersInRoom = "SELECT * FROM Users where GameCode = ? And BreakoutRoomCode = ?"
     const selectAllUsersInGame = "SELECT * FROM Users where GameCode = ?"
-    const selectAllRoomsInGame = "SELECT * FROM USers where GameCode = ?"
+    const selectAllRoomsInGame = "SELECT * FROM Rooms where GameCode = ?"
 
     socket.on("msg", (msg) => {
         let user = socket.id;
@@ -226,7 +250,8 @@ io.on("connection", (socket) => {
         // TODO: error handling
         let users = [];
         let duplicate = 1;
-        let valid = false
+        let valid = false;
+        let username = null;
         db.all("SELECT * FROM Users",(err,rows) => {
           if (err) {
             return console.error(err.message);
@@ -241,10 +266,13 @@ io.on("connection", (socket) => {
               duplicate++;
               if(!users.includes(msg.username+duplicate.toString())) {
                 valid = true;
+                username = msg.username+duplicate.toString();
               }
             }
           }
-          let username = msg.username+duplicate.toString();
+          else {
+            username = msg.username;
+          }
           db.run(insertUserQuery,[socket.id,username,"",""],(err) => {
             if(err) {
               return console.error(err.message);
@@ -255,6 +283,100 @@ io.on("connection", (socket) => {
 
         });
     });
+
+    socket.on("mergeRoom", (msg) => {
+      let users = [];
+      let host = null;
+      let newRoomCode = null;
+      let newQuestion = null;
+      
+      db.serialize(() => {
+        db.all(selectGameQuery,[msg.code],(err,rows) => {
+          if(err) {
+            return console.error(err.message);
+          }
+          host = rows[0].Host;
+        });
+        db.all(selectAllRoomsInGame,[msg.code],(err,rows) => {
+          if(err) {
+            return console.error(err.message);
+          }
+          newRoomCode = rows[0].RoomID;
+          rows.forEach(element => {
+            db.run("DELETE FROM Rooms Where GameCode = ?",[msg.code], (err) => {
+              if(err) {
+                return console.error(err.message);
+              }
+              console.log("removed");
+            })
+          });
+          newQuestion = "is a hot dog a sandwich";
+          db.run(insertRoomQuery,[newRoomCode,msg.code,newQuestion],(err) => {
+            if(err) {
+              return console.error(err.message);
+            }
+            db.all(selectAllUsersInGame,[msg.code],(err,rows) => {
+              if(err) {
+                return console.error(err.message);
+              }
+              rows.forEach(element => {
+                db.run("UPDATE Users SET BreakoutRoomCode = ? WHERE id = ?",[newRoomCode,element.id], (err) => {
+                  if(err) {
+                    return console.error(err.message);
+                  }
+                });
+              });
+              db.all(selectAllUsersInGame,[msg.code],(err,rows) => {
+                if(err) {
+                  return console.error(err.message);
+                }
+                rows.forEach(element => {
+                  users.push(element.id);
+                });
+                data = {
+                  host_id: host,
+                  participants: users,
+                  question: newQuestion,
+                }
+                console.log(data);
+                socket.emit("mergeRoom",data);
+              });
+            });
+          });
+        });
+      });
+    });
+
+    socket.on("mixRooms", (msg) => {
+      let roomIDs = [];
+      let totalRooms = null;
+      let userIDs = [];
+      let totalUsers = null;
+      db.serialize(() => {
+        db.all(selectAllUsersInGame,[msg.code], (err,rows) => {
+          if(err) {
+            return console.error(err.message) 
+          }
+          rows.forEach(element => {
+            userIDs.push(element.id);
+          });
+          totalUsers = userIDs.length;
+        })
+        db.all(selectAllRoomsInGame,[msg.code], (err,rows) => {
+          if(err) {
+            return console.error(err.message) 
+          }
+          rows.forEach(element => {
+            roomIDs.push(element.id);
+          });
+          totalRooms = roomIDs.length;
+        })
+        console.log(userIDs);
+        console.log(totalUsers);
+        console.log(roomIDs);
+        console.log(totalRooms);
+      })
+    })
 
     socket.on("createGame", (msg) => {
         // Generates the game, emits the code
