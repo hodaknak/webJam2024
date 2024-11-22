@@ -72,6 +72,11 @@ export default function Host() {
             setRooms((prevRooms) => [...prevRooms, msg]);
         });
 
+        socket.on("updateRooms", (msg) => {
+            setRooms(msg);
+            socket.emit("join", {});
+        });
+
         socket.emit("createGame", {});
         console.log("effect")
 
