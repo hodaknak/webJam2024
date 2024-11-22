@@ -18,14 +18,14 @@ export default function SocketTest() {
 
     const fetchMessages = () => {
         let data = {
-            host_id: "123489",
+            host_id: "Jeff",
             code: "ABCD",
             name: "1234",
             id: "3",
             username: "John"
             
         }
-        socket.emit("fetchRoom",data);
+        socket.emit("removeRoom",data);
     }
 
     return (
