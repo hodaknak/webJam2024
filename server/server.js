@@ -86,6 +86,10 @@ io.on("connection", (socket) => {
         io.emit("msg", res);
     });
 
+    socket.on("fetchQuestion", (msg) => {
+        // TODO: Create a way to fetch questions and emit it
+    });
+
     socket.on("username", (data) => {
         // TODO: verify username, set username in database
         // TODO: if username is the same as someone else, add a "2" (/other number) after it
