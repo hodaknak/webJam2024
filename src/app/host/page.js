@@ -71,6 +71,8 @@ export default function Host() {
             //console.log([...rooms, msg]);
 
             setRooms((prevRooms) => [...prevRooms, msg]);
+
+            //socket.emit("join", {code: msg.code})
         });
 
         socket.on("removeRoom", (msg) => {
@@ -110,12 +112,17 @@ export default function Host() {
     const hostRemoveRoom = () => {
         // TODO: connect to socket and attempt
         // TODO: update/fetch afterwards
-        socket.emit("removeRoom", {code: gameCode});
+        //socket.emit("removeRoom", {code: gameCode});
+        socket.emit("removeRoom", {});
+        if (rooms.length > 1) {
+            setRooms(rooms.slice(0, rooms.length - 1))
+        }
     }
 
     const hostShuffleParticipants = () => {
         // TODO: connect to socket and attempt
         // TODO: update/fetch afterwards
+        socket.emit("mixRooms", {code: gameCode});
     }
 
     return (
