@@ -21,11 +21,11 @@ export default function SocketTest() {
             host_id: "123489",
             code: "ABCD",
             name: "1234",
-            id: "1",
+            id: "12",
             username: "John"
             
         }
-        socket.emit("fetchRoom",data);
+        socket.emit("fetchGame",data);
     }
 
     return (
@@ -35,7 +35,7 @@ export default function SocketTest() {
                 <button onClick={fetchMessages}>request room data</button>
             </div>
             <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
-            <div>hello</div>
+            <div>bye</div>
         </div>
     )
 }
